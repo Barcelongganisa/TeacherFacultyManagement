@@ -88,24 +88,24 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Teachers Management
     Route::resource('teachers', AdminTeacherController::class);
     Route::post('teachers/search', [AdminTeacherController::class, 'search'])->name('teachers.search');
     Route::get('teachers/{id}/view', [AdminTeacherController::class, 'show'])->name('teachers.view');
-    
+
     // Students Management
     Route::resource('students', AdminStudentController::class);
     Route::post('students/search', [AdminStudentController::class, 'search'])->name('students.search');
-    
+
     // Subjects Management
     Route::resource('subjects', AdminSubjectController::class);
     Route::post('subjects/search', [AdminSubjectController::class, 'search'])->name('subjects.search');
-    
+
     // Classrooms Management
     Route::resource('classrooms', ClassroomController::class);
     Route::post('classrooms/search', [ClassroomController::class, 'search'])->name('classrooms.search');
-    
+
     // Schedules Management
     Route::get('schedules', [AdminScheduleController::class, 'index'])->name('schedules.index');
     Route::get('schedules/teacher/{teacher_id}', [AdminScheduleController::class, 'viewSchedule'])->name('schedules.view');
@@ -113,19 +113,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('schedules/{schedule_id}', [AdminScheduleController::class, 'update'])->name('schedules.update');
     Route::delete('schedules/{schedule_id}', [AdminScheduleController::class, 'destroy'])->name('schedules.destroy');
     Route::get('schedules/get-data/{schedule_id}', [AdminScheduleController::class, 'getScheduleData'])->name('schedules.get-data');
-    
+
     // Teacher Assignments
     Route::resource('assignments', AssignmentController::class)->except(['edit', 'update', 'show']);
     Route::post('assignments/search', [AssignmentController::class, 'search'])->name('assignments.search');
-    
+
     // Time Slots
     Route::resource('time-slots', TimeSlotController::class);
-    
+
     // Reservations Management
     Route::get('reservations', [AdminReservationController::class, 'index'])->name('reservations.index');
     Route::post('reservations/approve/{id}', [AdminReservationController::class, 'approve'])->name('reservations.approve');
     Route::post('reservations/reject/{id}', [AdminReservationController::class, 'reject'])->name('reservations.reject');
-    
+
     // Profile
     Route::get('profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::post('profile/update', [AdminProfileController::class, 'update'])->name('profile.update');
@@ -134,23 +134,23 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Announcements
     Route::get('/announcements', [StudentAnnouncementController::class, 'index'])->name('announcements');
     Route::post('/announcements/mark-read', [StudentAnnouncementController::class, 'markRead'])->name('announcements.mark-read');
-    
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
-    
+
     // Schedule
-    Route::get('/schedule', [StudentScheduleController::class, 'index'])->name('schedule');
-    
+    Route::get('/schedule', [StudentScheduleController::class, 'index'])->name('schedule'); // ← fixed
+
     // Subjects
     Route::get('/subjects', [StudentSubjectController::class, 'index'])->name('subjects');
     Route::post('/subjects/enroll', [StudentSubjectController::class, 'enroll'])->name('subjects.enroll');
     Route::post('/subjects/unenroll', [StudentSubjectController::class, 'unenroll'])->name('subjects.unenroll');
-    
+
     // Teachers
     Route::get('/teachers', [StudentTeacherController::class, 'index'])->name('teachers');
     Route::post('/teachers/search', [StudentTeacherController::class, 'search'])->name('teachers.search');
@@ -161,28 +161,28 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 Route::middleware(['auth', 'teacher'])->prefix('teacher')->name('teacher.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [TeacherDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Profile
     Route::get('/profile', [TeacherProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [TeacherProfileController::class, 'update'])->name('profile.update');
-    
+
     // Schedule
     Route::get('/schedule', [TeacherScheduleController::class, 'index'])->name('schedule');
-    
+
     // Reservations
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations');
     Route::post('/reservations/create', [ReservationController::class, 'store'])->name('reservations.store');
-    
+
     // Availability
     Route::get('/availability', [AvailabilityController::class, 'index'])->name('availability');
     Route::post('/availability/set', [AvailabilityController::class, 'setAvailability'])->name('availability.set');
-    
+
     // Subjects
     Route::get('/subjects', [TeacherSubjectController::class, 'index'])->name('subjects');
-    
+
     // Current Assignment
     Route::get('/current-assignment', [CurrentAssignmentController::class, 'index'])->name('current-assignment');
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

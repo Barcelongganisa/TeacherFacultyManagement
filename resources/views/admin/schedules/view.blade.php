@@ -106,8 +106,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="teacher_id" value="{{ $teacher->id }}">
-                    
+                    <input type="hidden" name="teacher_id" value="{{ $teacher->user_id }}">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="add_subject_id" class="form-label">Subject <span class="text-danger">*</span></label>

@@ -82,7 +82,7 @@
                                                 <i class="fas fa-map-marker-alt text-success me-2"></i>
                                                 <div>
                                                     <strong>{{ $schedule->room_number }}</strong>
-                                                    @if(isset($schedule->room_name))
+                                                   @if(!empty($schedule->room_name))
                                                         <br><small class="text-muted">{{ $schedule->room_name }}</small>
                                                     @endif
                                                 </div>
@@ -163,7 +163,7 @@
                     
                     @foreach($days as $index => $day)
                         @php
-                            $daySchedules = $schedules->where('day_of_week', $day);
+                           $daySchedules = $schedules->filter(fn($s) => $s->day_of_week === $day);
                         @endphp
                         <div class="col-md-3 mb-3">
                             <div class="p-3 rounded-3" style="background: {{ $dayColors[$index % count($dayColors)] }}; border-left: 4px solid var(--primary-green);">
