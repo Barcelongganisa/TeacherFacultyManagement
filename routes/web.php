@@ -3,9 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
-use App\Http\Controllers\Student\AnnouncementController;
+use App\Http\Controllers\Student\StudentAnnouncementController;
 use App\Http\Controllers\Student\ScheduleController as StudentScheduleController;
-use App\Http\Controllers\Student\SubjectController;
+use App\Http\Controllers\Student\StudentSubjectController;
 use App\Http\Controllers\Student\TeacherController as StudentTeacherController;
 
 // Teacher Routes
@@ -14,14 +14,14 @@ use App\Http\Controllers\Teacher\ProfileController as TeacherProfileController;
 use App\Http\Controllers\Teacher\ScheduleController as TeacherScheduleController;
 use App\Http\Controllers\Teacher\ReservationController;
 use App\Http\Controllers\Teacher\AvailabilityController;
-use App\Http\Controllers\Teacher\SubjectController as TeacherSubjectController;
+use App\Http\Controllers\Teacher\StudentSubjectController as TeacherSubjectController;
 use App\Http\Controllers\Teacher\CurrentAssignmentController;
 
 // Admin Routes
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
-use App\Http\Controllers\Admin\SubjectController as AdminSubjectController;
+use App\Http\Controllers\Admin\StudentSubjectController as AdminSubjectController;
 use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
 use App\Http\Controllers\Admin\AssignmentController;
@@ -82,28 +82,28 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
     
     // Announcements
-    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements');
-    Route::post('/announcements/mark-read', [AnnouncementController::class, 'markRead'])->name('announcements.mark-read');
+    Route::get('/announcements', [StudentAnnouncementController::class, 'index'])->name('announcements');
+    Route::post('/announcements/mark-read', [StudentAnnouncementController::class, 'markRead'])->name('announcements.mark-read');
     
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     
     // Schedule
-    Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule');
+    Route::get('/schedule', [StudentScheduleController::class, 'index'])->name('schedule');
     
     // Subjects
-    Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects');
-    Route::post('/subjects/enroll', [SubjectController::class, 'enroll'])->name('subjects.enroll');
-    Route::post('/subjects/unenroll', [SubjectController::class, 'unenroll'])->name('subjects.unenroll');
+    Route::get('/subjects', [StudentSubjectController::class, 'index'])->name('subjects');
+    Route::post('/subjects/enroll', [StudentSubjectController::class, 'enroll'])->name('subjects.enroll');
+    Route::post('/subjects/unenroll', [StudentSubjectController::class, 'unenroll'])->name('subjects.unenroll');
     
     // Teachers
-    Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers');
-    Route::post('/teachers/search', [TeacherController::class, 'search'])->name('teachers.search');
-    Route::get('/teacher-profile/{id}', [TeacherController::class, 'show'])->name('teacher-profile');
+    Route::get('/teachers', [StudentTeacherController::class, 'index'])->name('teachers');
+    Route::post('/teachers/search', [StudentTeacherController::class, 'search'])->name('teachers.search');
+    Route::get('/teacher-profile/{id}', [StudentTeacherController::class, 'show'])->name('teacher-profile');
 });
 
 // Teacher Routes
