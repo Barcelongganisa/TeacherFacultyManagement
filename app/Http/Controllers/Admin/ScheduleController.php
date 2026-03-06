@@ -18,53 +18,53 @@ class ScheduleController extends AdminBaseController
         $search = $request->get('search', '');
         $department = $request->get('department', '');
         $status = $request->get('status', '');
-        
+
         $query = Teacher::with('user');
-        
+
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('department', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('department', 'like', "%{$search}%");
             });
         }
-        
+
         if ($department) {
             $query->where('department', $department);
         }
-        
+
         if ($status) {
             $query->where('status', $status);
         }
-        
+
         $teachers = $query->orderBy('name')->paginate(20);
-        
+
         $departments = Teacher::distinct('department')->pluck('department');
-        
+
         return view('admin.schedules.index', compact('teachers', 'search', 'department', 'status', 'departments'));
     }
-    
+
     public function viewSchedule($teacherId)
     {
         $teacher = Teacher::with('user')->findOrFail($teacherId);
-        
+
         $timeSlots = TimeSlot::where('status', 'active')->orderBy('start_time')->get();
-        
-        $schedules = Schedule::where('teacher_id', $teacherId)
+        $userId = $teacher->user_id;
+        $schedules = Schedule::where('teacher_id', $userId)
             ->with(['subject', 'classroom', 'timeSlot'])
             ->get();
-            
+
         $scheduleData = [];
         foreach ($schedules as $schedule) {
             $scheduleData[$schedule->day_of_week][$schedule->time_slot_id] = $schedule;
         }
-        
+
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        
+
         $subjects = Subject::where('status', 'active')->orderBy('subject_name')->get();
         $classrooms = Classroom::where('status', 'active')->orderBy('room_number')->get();
-        
+
         return view('admin.schedules.view', compact(
             'teacher',
             'timeSlots',
@@ -74,12 +74,12 @@ class ScheduleController extends AdminBaseController
             'classrooms'
         ));
     }
-    
+
     public function getScheduleData($scheduleId)
     {
         $schedule = Schedule::with(['subject', 'classroom', 'timeSlot'])
             ->findOrFail($scheduleId);
-            
+
         return response()->json([
             'success' => true,
             'subject_id' => $schedule->subject_id,
@@ -95,40 +95,25 @@ class ScheduleController extends AdminBaseController
             'end_time' => $schedule->timeSlot->end_time,
         ]);
     }
-    
-    public function store(Request $request)
-    {
+
+    public function store(Request $request){
         $validated = $request->validate([
-            'teacher_id' => 'required|exists:teachers,id',
-            'subject_id' => 'required|exists:subjects,id',
+            'teacher_id'   => 'required|exists:users,id',
+            'subject_id'   => 'required|exists:subjects,id',
             'classroom_id' => 'required|exists:classrooms,id',
-            'day_of_week' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+            'day_of_week'  => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
             'time_slot_id' => 'required|exists:time_slots,id',
-            'status' => 'nullable|in:active,inactive,cancelled',
+            'status'       => 'nullable|in:active,inactive,cancelled',
         ]);
-        
-        // Check for teacher schedule conflict
         $conflict = Schedule::where('teacher_id', $validated['teacher_id'])
             ->where('day_of_week', $validated['day_of_week'])
             ->where('time_slot_id', $validated['time_slot_id'])
             ->where('status', 'active')
             ->exists();
-            
+
         if ($conflict) {
             return back()->with('error', 'Schedule conflict: Teacher already has a schedule for this day and time slot.');
         }
-        
-        // Check teacher availability
-        $availability = TeacherAvailability::where('teacher_id', $validated['teacher_id'])
-            ->where('day_of_week', $validated['day_of_week'])
-            ->where('time_slot_id', $validated['time_slot_id'])
-            ->first();
-            
-        if ($availability && strtolower($availability->status) === 'unavailable') {
-            return back()->with('error', 'Cannot add schedule: Teacher has marked themselves as UNAVAILABLE for this time slot.');
-        }
-        
-        // Check classroom conflict
         $roomConflict = Schedule::where('classroom_id', $validated['classroom_id'])
             ->where('day_of_week', $validated['day_of_week'])
             ->where('time_slot_id', $validated['time_slot_id'])
@@ -136,52 +121,53 @@ class ScheduleController extends AdminBaseController
             ->where('teacher_id', '!=', $validated['teacher_id'])
             ->with(['teacher', 'subject'])
             ->first();
-            
         if ($roomConflict) {
-            $teacher = $roomConflict->teacher;
-            return back()->with('error', "Room conflict: This classroom is already booked on {$validated['day_of_week']} at this time by {$teacher->first_name} {$teacher->last_name} for {$roomConflict->subject->subject_name}.");
+            $conflictUser    = $roomConflict->teacher;
+            $conflictTeacher = Teacher::where('user_id', $conflictUser->id)->first();
+            $fullName        = $conflictTeacher ? $conflictTeacher->name : $conflictUser->name;
+            return back()->with('error', "Room conflict: This classroom is already booked on {$validated['day_of_week']} at this time by {$fullName} for {$roomConflict->subject->subject_name}.");
         }
-        
         try {
             Schedule::create($validated + ['status' => $validated['status'] ?? 'active']);
-            
-            return redirect()->route('admin.schedules.view', $validated['teacher_id'])
+
+            $teacher = Teacher::where('user_id', $validated['teacher_id'])->firstOrFail();
+
+            return redirect()->route('admin.schedules.view', $teacher->id)
                 ->with('success', 'Schedule added successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error adding schedule: ' . $e->getMessage());
         }
     }
-    
-    public function update(Request $request, $scheduleId)
-    {
+
+    public function update(Request $request, $scheduleId){
         $schedule = Schedule::findOrFail($scheduleId);
-        
         $validated = $request->validate([
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_id'   => 'required|exists:subjects,id',
             'classroom_id' => 'required|exists:classrooms,id',
-            'day_of_week' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+            'day_of_week'  => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
             'time_slot_id' => 'required|exists:time_slots,id',
-            'status' => 'required|in:active,inactive,cancelled',
+            'status'       => 'required|in:active,inactive,cancelled',
         ]);
-        
+
         try {
             $schedule->update($validated);
-            
-            return redirect()->route('admin.schedules.view', $schedule->teacher_id)
+            $teacher = Teacher::where('user_id', $schedule->teacher_id)->firstOrFail();
+
+            return redirect()->route('admin.schedules.view', $teacher->id)
                 ->with('success', 'Schedule updated successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error updating schedule: ' . $e->getMessage());
         }
     }
-    
+
     public function destroy($scheduleId)
     {
         try {
             $schedule = Schedule::findOrFail($scheduleId);
             $teacherId = $schedule->teacher_id;
-            
+
             $schedule->delete();
-            
+
             return redirect()->route('admin.schedules.view', $teacherId)
                 ->with('success', 'Schedule deleted successfully!');
         } catch (\Exception $e) {

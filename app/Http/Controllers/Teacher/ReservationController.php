@@ -12,6 +12,8 @@ class ReservationController extends Controller
     public function index()
     {
         $user = Auth::user();
+        
+        // Get teacher ID
         $teacher = DB::table('teachers')->where('user_id', $user->id)->first();
         $teacherId = $teacher->id ?? null;
         
@@ -86,6 +88,17 @@ class ReservationController extends Controller
             'created_at' => now(),
             'updated_at' => now()
         ]);
+
+        // DB::table('schedules')->insert([
+        //     'teacher_id' => $teacherId,
+        //     'subject_id' => $request->classroom_id,
+        //     'classroom_id' => $request->reservation_date,
+        //     'time_slot_id' => $request->time_slot_id,
+        //     'day_of_week' => $request->notes,
+        //     'status' => 'pending',
+        //     'created_at' => now(),
+        //     'updated_at' => now()
+        // ]);
         
         return redirect()->route('teacher.reservations')->with('message', 'Reservation request submitted successfully.');
     }
