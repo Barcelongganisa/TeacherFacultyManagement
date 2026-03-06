@@ -18,7 +18,20 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'email_verified_at', 'remember_token', 'profile_image'
+        'name', 
+        'email', 
+        'password', 
+        'role', 
+        'email_verified_at', 
+        'remember_token', 
+        'profile_image', 
+        'campus_id',
+        'status',
+        'profile_image',
+        'phone',
+        'department',
+        'address',
+        'bio',
     ];
 
     /**
@@ -52,5 +65,10 @@ class User extends Authenticatable
     public function schedules()
     {
         return $this->hasManyThrough(Schedule::class, Teacher::class);
+    }
+
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class, 'campus_id');
     }
 }

@@ -160,6 +160,7 @@
                         'student' => 'student.dashboard',
                         'teacher' => 'teacher.dashboard',
                         'admin' => 'admin.dashboard',
+                        'superadmin' => 'superadmin.dashboard',
                         default => 'dashboard'
                     };
                 @endphp

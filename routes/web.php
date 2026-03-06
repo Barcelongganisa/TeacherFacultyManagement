@@ -29,8 +29,59 @@ use App\Http\Controllers\Admin\TimeSlotController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 
+// Super Admin Routes
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
+use App\Http\Controllers\SuperAdmin\CampusController as SuperAdminCampusController;
+use App\Http\Controllers\SuperAdmin\AssignmentController as SuperAdminAssignmentController;
+use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservationController;
+use App\Http\Controllers\SuperAdmin\ProfileController as SuperAdminProfileController;
+
 Route::get('/', function () {
     return view('welcome');
+});
+
+// Super Admin Routes
+Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->name('superadmin.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+    
+    // User Management
+    Route::resource('users', SuperAdminUserController::class);
+    Route::post('users/search', [SuperAdminUserController::class, 'search'])->name('users.search');
+    Route::post('users/{user}/toggle-status', [SuperAdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::post('users/{user}/reset-password', [SuperAdminUserController::class, 'resetPassword'])->name('users.reset-password');
+    
+    // Campus Management
+    Route::resource('campuses', SuperAdminCampusController::class);
+    Route::post('campuses/search', [SuperAdminCampusController::class, 'search'])->name('campuses.search');
+    
+    // Super Admin Profile
+    Route::get('profile', [SuperAdminDashboardController::class, 'editProfile'])->name('profile.edit');
+    
+    // Campus Assignments
+    // Route::get('assignments', [SuperAdminAssignmentController::class, 'index'])->name('assignments.index');
+    // Route::post('assignments/assign', [SuperAdminAssignmentController::class, 'assign'])->name('assignments.assign');
+    // Route::delete('assignments/{assignment}', [SuperAdminAssignmentController::class, 'remove'])->name('assignments.remove');
+    // Route::post('assignments/bulk-assign', [SuperAdminAssignmentController::class, 'bulkAssign'])->name('assignments.bulk-assign');
+
+    // Reservations (global view)
+    Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');
+    Route::post('reservations/{reservation}/approve', [SuperAdminReservationController::class, 'approve'])->name('reservations.approve');
+    Route::post('reservations/{reservation}/reject', [SuperAdminReservationController::class, 'reject'])->name('reservations.reject');
+    
+    // Profile
+    Route::get('profile', [SuperAdminProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('profile', [SuperAdminProfileController::class, 'update'])->name('profile.update');
+    Route::post('profile/password', [SuperAdminProfileController::class, 'changePassword'])->name('profile.password');
+    Route::post('profile/image', [SuperAdminProfileController::class, 'updateImage'])->name('profile.image');
+    Route::delete('profile/image', [SuperAdminProfileController::class, 'removeImage'])->name('profile.image.remove');
+    Route::get('profile/activity', [SuperAdminProfileController::class, 'activityLogs'])->name('profile.activity');
+    Route::get('profile/logins', [SuperAdminProfileController::class, 'loginHistory'])->name('profile.logins');
+    Route::post('profile/notifications', [SuperAdminProfileController::class, 'updateNotifications'])->name('profile.notifications');
+    Route::post('profile/two-factor', [SuperAdminProfileController::class, 'setupTwoFactor'])->name('profile.two-factor');
+    Route::get('profile/export', [SuperAdminProfileController::class, 'exportData'])->name('profile.export');
+    Route::delete('profile', [SuperAdminProfileController::class, 'deleteAccount'])->name('profile.delete');
 });
 
 // Admin Routes

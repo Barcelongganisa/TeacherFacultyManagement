@@ -196,6 +196,7 @@ $displayName = $user->name ?? $user->username ?? 'Administrator';
     font-weight: 500;
     margin-top: 10px;
     border: 1px solid var(--primary-green);
+    margin-bottom: 10px;
 }
 
 /* Navigation Menu */
