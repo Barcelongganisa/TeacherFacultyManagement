@@ -21,8 +21,8 @@ class DashboardController extends Controller
         
         // Today's reservations
         $todaysReservations = Reservation::with(['classroom.campus', 'user'])
-            ->whereDate('reserved_date', today())
-            ->orderBy('start_time')
+            ->whereDate('reservation_date', today())
+            ->orderBy('created_at', 'desc')
             ->get();
             
         // Pending reservations
