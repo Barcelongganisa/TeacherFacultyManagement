@@ -21,7 +21,7 @@ use App\Http\Controllers\Teacher\CurrentAssignmentController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
-use App\Http\Controllers\Admin\StudentSubjectController as AdminSubjectController;
+use App\Http\Controllers\Admin\SubjectController as AdminSubjectController;
 use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
 use App\Http\Controllers\Admin\AssignmentController;
