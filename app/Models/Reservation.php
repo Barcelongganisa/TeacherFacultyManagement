@@ -8,7 +8,7 @@ class Reservation extends Model
 {
     protected $fillable = [
         'teacher_id',
-        'room',
+        'classroom_id',
         'date',
         'start_time',
         'end_time',

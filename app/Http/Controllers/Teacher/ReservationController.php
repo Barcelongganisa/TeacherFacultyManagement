@@ -12,8 +12,6 @@ class ReservationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        // Get teacher ID
         $teacher = DB::table('teachers')->where('user_id', $user->id)->first();
         $teacherId = $teacher->id ?? null;
         

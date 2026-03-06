@@ -7,9 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Teacher extends Model
 {
     protected $fillable = [
-        'user_id', 'first_name', 'last_name', 'email',
-        'phone', 'department', 'qualification',
-        'hire_date', 'bio', 'profile_image', 'status'
+        'employee_id',
+        'user_id',
+        'name',
+        'department',
+        'specialization',
+        'email',
+        'phone',
+        'profile_image',
+        'password',
+        'status'
     ];
 
     public function user()
