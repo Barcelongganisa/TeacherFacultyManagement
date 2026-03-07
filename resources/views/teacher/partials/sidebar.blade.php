@@ -382,12 +382,12 @@ $displayName = $teacher->name ?? $user->name ?? 'Teacher';
             </a>
         </li>
         
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a href="{{ route('teacher.availability') }}" class="nav-link {{ request()->routeIs('teacher.availability') ? 'active' : '' }}">
                 <i class="fas fa-clock"></i>
                 <span>Set Availability</span>
             </a>
-        </li>
+        </li> --}}
 
         <div class="nav-divider"></div>
 

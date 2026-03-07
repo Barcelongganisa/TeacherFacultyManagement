@@ -54,7 +54,6 @@
                                         <div class="subject-code">
                                             <strong>{{ $class->subject_code ?? 'N/A' }}</strong>
                                         </div>
-                                        <div class="subject-name">{{ $class->subject_name }}</div>
                                         <div class="room-info">
                                             <small>
                                                 <i class="fas fa-map-marker-alt"></i> 

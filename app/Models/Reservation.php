@@ -14,4 +14,9 @@ class Reservation extends Model
         'end_time',
         'status'
     ];
+
+    public function classroom()
+    {
+        return $this->belongsTo(Classroom::class);
+    }
 }

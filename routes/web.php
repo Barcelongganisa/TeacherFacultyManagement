@@ -182,6 +182,9 @@ Route::middleware(['auth', 'teacher'])->prefix('teacher')->name('teacher.')->gro
 
     // Current Assignment
     Route::get('/current-assignment', [CurrentAssignmentController::class, 'index'])->name('current-assignment');
+
+    Route::get('/subject/{id}/schedule', [TeacherSubjectController::class, 'getSchedule'])->name('subjects.schedule');
+    Route::get('/subject/{id}/students', [TeacherSubjectController::class, 'getStudents'])->name('subjects.students');
 });
 
 
