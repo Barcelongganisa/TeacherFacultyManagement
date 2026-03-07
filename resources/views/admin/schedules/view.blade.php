@@ -7,7 +7,7 @@
         <div>
             <h1>
                 <i class="fas fa-calendar-alt me-2 text-success"></i>
-                {{ $teacher->first_name }} {{ $teacher->last_name }}'s Schedule
+                {{ $teacher->name }}'s Schedule
             </h1>
             <p class="text-muted">Weekly teaching schedule overview</p>
         </div>

@@ -171,4 +171,3 @@ class TeacherController extends AdminBaseController
         return '-';
     }
 }
-

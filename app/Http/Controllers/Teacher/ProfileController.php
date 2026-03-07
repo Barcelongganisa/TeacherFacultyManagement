@@ -76,8 +76,7 @@ class ProfileController extends Controller
             DB::table('teachers')
                 ->where('user_id', $userId)
                 ->update([
-                    'first_name' => $request->full_name, // Store full name in first_name
-                    'last_name' => '', // Leave empty or null
+                    'name' => $request->full_name, // Store full name in first_name
                     'phone' => $request->phone,
                     'department' => $request->department,
                     'updated_at' => now()
@@ -85,8 +84,7 @@ class ProfileController extends Controller
         } else {
             DB::table('teachers')->insert([
                 'user_id' => $userId,
-                'first_name' => $request->full_name,
-                'last_name' => '',
+                'name' => $request->full_name,
                 'phone' => $request->phone,
                 'department' => $request->department,
                 'created_at' => now(),

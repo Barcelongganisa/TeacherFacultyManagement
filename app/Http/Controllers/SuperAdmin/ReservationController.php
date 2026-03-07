@@ -47,16 +47,16 @@ class ReservationController extends Controller
         
         // Filter by date
         if ($request->filled('date')) {
-            $query->whereDate('reserved_date', $request->date);
+            $query->whereDate('reservation_date', $request->date);
         }
         
         // Date range filters
         if ($request->filled('start_date')) {
-            $query->whereDate('reserved_date', '>=', $request->start_date);
+            $query->whereDate('reservation_date', '>=', $request->start_date);
         }
         
         if ($request->filled('end_date')) {
-            $query->whereDate('reserved_date', '<=', $request->end_date);
+            $query->whereDate('reservation_date', '<=', $request->end_date);
         }
         
         $reservations = $query->latest()->paginate(15);
@@ -65,7 +65,7 @@ class ReservationController extends Controller
         $totalReservations = Reservation::count();
         $pendingCount = Reservation::where('status', 'pending')->count();
         $approvedCount = Reservation::where('status', 'approved')->count();
-        $todayCount = Reservation::whereDate('reserved_date', today())->count();
+        $todayCount = Reservation::whereDate('reservation_date', today())->count();
         
         // Get campuses for filter dropdown
         $campuses = Campus::where('status', 'active')->get();
@@ -92,7 +92,7 @@ class ReservationController extends Controller
         // Check for conflicts
         $conflicts = Reservation::where('classroom_id', $reservation->classroom_id)
             ->where('id', '!=', $reservation->id)
-            ->where('reserved_date', $reservation->reserved_date)
+            ->where('reservation_date', $reservation->reservation_date)
             ->where('status', 'approved')
             ->where(function($q) use ($reservation) {
                 $q->whereBetween('start_time', [$reservation->start_time, $reservation->end_time])
@@ -201,11 +201,11 @@ class ReservationController extends Controller
         }
         
         if ($request->filled('start_date')) {
-            $query->whereDate('reserved_date', '>=', $request->start_date);
+            $query->whereDate('reservation_date', '>=', $request->start_date);
         }
         
         if ($request->filled('end_date')) {
-            $query->whereDate('reserved_date', '<=', $request->end_date);
+            $query->whereDate('reservation_date', '<=', $request->end_date);
         }
         
         $reservations = $query->get();
@@ -228,7 +228,7 @@ class ReservationController extends Controller
         foreach ($reservations as $res) {
             fputcsv($handle, [
                 $res->id,
-                $res->reserved_date->format('Y-m-d'),
+                $res->reservation_date->format('Y-m-d'),
                 $res->start_time,
                 $res->end_time,
                 $res->classroom->campus->campus_name ?? 'N/A',
@@ -255,14 +255,14 @@ class ReservationController extends Controller
     {
         $request->validate([
             'classroom_id' => 'required|exists:classrooms,id',
-            'reserved_date' => 'required|date',
+            'reservation_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
             'exclude_id' => 'nullable|exists:reservations,id'
         ]);
 
         $query = Reservation::where('classroom_id', $request->classroom_id)
-            ->where('reserved_date', $request->reserved_date)
+            ->where('reservation_date', $request->reservation_date)
             ->where('status', 'approved')
             ->where(function($q) use ($request) {
                 $q->whereBetween('start_time', [$request->start_time, $request->end_time])

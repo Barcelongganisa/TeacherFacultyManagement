@@ -101,6 +101,7 @@ class AssignmentController extends AdminBaseController
     public function create()
     {
         $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
+        $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
         $subjects = Subject::where('status', 'active')->orderBy('subject_name')->get();
         
         return view('admin.assignments.create', compact('teachers', 'subjects'));

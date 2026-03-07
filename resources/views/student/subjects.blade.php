@@ -2,6 +2,16 @@
 
 @section('title', 'Subjects & Enrollment')
 
+<style>
+        body > div.sidebar > div:nth-child(1){
+        display: flex !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+</style>
+
 @section('content')
 <div class="container-fluid">
     <!-- Back Button and Title -->

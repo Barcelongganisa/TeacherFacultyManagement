@@ -63,9 +63,9 @@
                 <a href="{{ route('teacher.profile.edit') }}" class="btn btn-primary btn-sm mb-2 w-100">
                     <i class="fas fa-user-edit"></i> Edit My Profile
                 </a>
-                <a href="{{ route('teacher.availability') }}" class="btn btn-primary btn-sm mb-2 w-100">
+                {{-- <a href="{{ route('teacher.availability') }}" class="btn btn-primary btn-sm mb-2 w-100">
                     <i class="fas fa-clock"></i> Set Availability
-                </a>
+                </a> --}}
                 <a href="{{ route('teacher.reservations') }}" class="btn btn-primary btn-sm mb-2 w-100">
                     <i class="fas fa-door-open"></i> Room Reservations
                 </a>
