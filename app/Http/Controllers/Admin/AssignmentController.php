@@ -21,7 +21,8 @@ class AssignmentController extends AdminBaseController
         
         if ($search) {
             $query->whereHas('teacher', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%");
             })->orWhereHas('subject', function($q) use ($search) {
                 $q->where('subject_name', 'like', "%{$search}%")
                   ->orWhere('subject_code', 'like', "%{$search}%");
@@ -66,7 +67,8 @@ class AssignmentController extends AdminBaseController
         
         if ($search) {
             $query->whereHas('teacher', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%");
             })->orWhereHas('subject', function($q) use ($search) {
                 $q->where('subject_name', 'like', "%{$search}%")
                   ->orWhere('subject_code', 'like', "%{$search}%");
@@ -98,6 +100,7 @@ class AssignmentController extends AdminBaseController
     
     public function create()
     {
+        $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
         $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
         $subjects = Subject::where('status', 'active')->orderBy('subject_name')->get();
         

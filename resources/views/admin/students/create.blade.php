@@ -24,50 +24,84 @@
             <div class="card-body">
                 <form action="{{ route('admin.students.store') }}" method="POST">
                     @csrf
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
-                        <input type="text" 
-                               class="form-control @error('username') is-invalid @enderror" 
-                               id="username" 
-                               name="username" 
-                               value="{{ old('username') }}" 
-                               required>
-                        @error('username')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control @error('first_name') is-invalid @enderror"
+                                   id="first_name"
+                                   name="first_name"
+                                   value="{{ old('first_name') }}"
+                                   placeholder="Enter first name"
+                                   required>
+                            @error('first_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control @error('last_name') is-invalid @enderror"
+                                   id="last_name"
+                                   name="last_name"
+                                   value="{{ old('last_name') }}"
+                                   placeholder="Enter last name"
+                                   required>
+                            @error('last_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                        <input type="email" 
-                               class="form-control @error('email') is-invalid @enderror" 
-                               id="email" 
-                               name="email" 
-                               value="{{ old('email') }}" 
+                        <input type="email"
+                               class="form-control @error('email') is-invalid @enderror"
+                               id="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               placeholder="Enter email address"
                                required>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+                     <div class="mb-3">
+                            <label for="campus" class="form-label">Campus <span class="text-danger">*</span></label>
+                            <select class="form-control @error('campus') is-invalid @enderror"
+                                    id="campus"
+                                    name="campus"
+                                    required>
+                                <option value="">Select Campus</option>
+                                <option value="Main Campus" {{ old('campus') == 'Main Campus' ? 'selected' : '' }}>Main Campus</option>
+                                <option value="Congressional Extension Campus" {{ old('campus') == 'Congressional Extension Campus' ? 'selected' : '' }}>Congressional Extension Campus</option>
+                                <option value="Bagong Silang Extension Campus" {{ old('campus') == 'Bagong Silang Extension Campus' ? 'selected' : '' }}>Bagong Silang Extension Campus</option>
+                                <option value="Camarin Extension Campus" {{ old('campus') == 'Camarin Extension Campus' ? 'selected' : '' }}>Camarin Extension Campus</option>
+                            </select>
+                            @error('campus')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                     <div class="mb-3">
                         <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-                        <input type="password" 
-                               class="form-control @error('password') is-invalid @enderror" 
-                               id="password" 
-                               name="password" 
+                        <input type="password"
+                               class="form-control @error('password') is-invalid @enderror"
+                               id="password"
+                               name="password"
+                               placeholder="Minimum 8 characters"
                                required>
                         <small class="text-muted">Minimum 8 characters</small>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
-                        <select class="form-select @error('status') is-invalid @enderror" 
-                                id="status" 
+                        <select class="form-select @error('status') is-invalid @enderror"
+                                id="status"
                                 name="status">
                             <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -76,7 +110,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-save me-2"></i>Add Student

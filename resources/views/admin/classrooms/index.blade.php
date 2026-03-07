@@ -113,7 +113,7 @@
                         <th>Room Number</th>
                         <th>Room Name</th>
                         <th>Building</th>
-                        <th>Floor</th>
+                        
                         <th>Type</th>
                         <th>Capacity</th>
                         <th>Status</th>
@@ -126,7 +126,7 @@
                             <td><strong>{{ $classroom->room_number }}</strong></td>
                             <td>{{ $classroom->room_name }}</td>
                             <td>{{ $classroom->building ?? '-' }}</td>
-                            <td>{{ $classroom->floor ?? '-' }}</td>
+                            
                             <td>
                                 <span class="badge bg-info text-white">
                                     {{ ucfirst(str_replace('_', ' ', $classroom->room_type)) }}

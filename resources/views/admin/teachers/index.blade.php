@@ -92,6 +92,7 @@
                         <th>Phone</th>
                         <th>Department</th>
                         <th>Qualification</th>
+                        <th>Campus</th>
                         <th>Status</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -113,7 +114,8 @@
                             <td>{{ $teacher->email }}</td>
                             <td>{{ $teacher->phone ?? '-' }}</td>
                             <td>{{ $teacher->department ?? '-' }}</td>
-                            <td>{{ $teacher->qualification ?? '-' }}</td>
+                            <td>{{ $teacher->specialization ?? '-' }}</td>
+                             <td>{{ $teacher->campus ?? '-' }}</td>
                             <td>
                                 <span class="badge bg-{{ $teacher->status === 'active' ? 'success' : ($teacher->status === 'inactive' ? 'danger' : 'warning') }}">
                                     {{ ucfirst($teacher->status) }}

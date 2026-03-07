@@ -79,7 +79,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="text-muted small">Full Name</label>
-                        <p class="fw-bold">{{ $teacher->first_name }} {{ $teacher->last_name }}</p>
+                        <p class="fw-bold">{{ $teacher->name }}</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="text-muted small">Email Address</label>
@@ -95,11 +95,11 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="text-muted small">Qualification</label>
-                        <p class="fw-bold">{{ $teacher->qualification ?? 'Not specified' }}</p>
+                        <p class="fw-bold">{{ $teacher->specialization ?? 'Not specified' }}</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="text-muted small">Hire Date</label>
-                        <p class="fw-bold">{{ $teacher->hire_date ? $teacher->hire_date->format('F j, Y') : 'Not set' }}</p>
+                        <p class="fw-bold">{{ $teacher->created_at ? $teacher->created_at->format('F j, Y') : 'Not set' }}</p>
                     </div>
                     <div class="col-12 mb-3">
                         <label class="text-muted small">Registration Date</label>

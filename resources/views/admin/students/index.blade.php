@@ -88,6 +88,7 @@
                         <th>ID</th>
                         <th>Username</th>
                         <th>Email</th>
+                        <th>Campus</th>
                         <th>Status</th>
                         <th>Created At</th>
                         <th class="text-end">Actions</th>
@@ -106,6 +107,7 @@
                                 </div>
                             </td>
                             <td>{{ $student->email }}</td>
+                            <td>{{ $student->campus }}</td>
                             <td>
                                 <span class="badge bg-{{ $student->status === 'active' ? 'success' : 'danger' }}">
                                     {{ ucfirst($student->status) }}

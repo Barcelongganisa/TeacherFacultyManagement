@@ -27,8 +27,7 @@ class ReservationController extends AdminBaseController
             $reservation = RoomReservation::findOrFail($id);
             $reservation->update(['status' => 'approved']);
             
-            return redirect()->route('admin.reservations.index')
-                ->with('success', 'Reservation approved successfully!');
+            return redirect()->route('admin.reservations.index')->with('success', 'Reservation approved successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error approving reservation: ' . $e->getMessage());
         }

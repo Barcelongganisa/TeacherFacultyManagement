@@ -22,10 +22,10 @@ class TeacherController extends AdminBaseController
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
+                $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('department', 'like', "%{$search}%");
+                    ->orWhere('department', 'like', "%{$search}%")
+                    ->orWhere('employee_id', 'like', "%{$search}%");
             });
         }
 
@@ -47,10 +47,10 @@ class TeacherController extends AdminBaseController
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
+                $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('department', 'like', "%{$search}%");
+                    ->orWhere('department', 'like', "%{$search}%")
+                    ->orWhere('employee_id', 'like', "%{$search}%");
             });
         }
 
@@ -71,40 +71,42 @@ class TeacherController extends AdminBaseController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'username' => 'required|string|unique:users,name',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'phone' => 'nullable|string',
-            'department' => 'nullable|string',
+            'employee_id'   => 'required|string|unique:teachers,employee_id',
+            'email'         => 'required|email|unique:users,email|unique:teachers,email',
+            'password'      => 'required|string|min:8',
+            'first_name'    => 'required|string',
+            'last_name'     => 'required|string',
+            'phone'         => 'nullable|string',
+            'campus'        => 'required|string',
+            'department'    => 'nullable|string',
             'qualification' => 'nullable|string',
-            'hire_date' => 'nullable|date',
-            'bio' => 'nullable|string',
+            'hire_date'     => 'nullable|date',
+            'bio'           => 'nullable|string',
         ]);
 
         DB::beginTransaction();
 
         try {
-            // Create user
             $user = User::create([
-                'name' => $validated['username'],
-                'email' => $validated['email'],
+                'name'     => $validated['first_name'] . ' ' . $validated['last_name'],
+                'email'    => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => 'teacher',
-                'status' => 'active',
+                'role'     => 'teacher',
+                'status'   => 'active',
+                'campus'         => $validated['campus'],
             ]);
 
-            // Create teacher
             Teacher::create([
-                'user_id' => $user->id,
-                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'department' => $validated['department'],
-                'specialization' => $validated['qualification'],
-                'password' => Hash::make($validated['password']),
-                'status' => 'active',
+                'user_id'        => $user->id,
+                'employee_id'    => $validated['employee_id'],
+                'name'           => $validated['first_name'] . ' ' . $validated['last_name'],
+                'email'          => $validated['email'],
+                'phone'          => $validated['phone'] ?? null,
+                'department'     => $validated['department'] ?? null,
+                'specialization' => $validated['qualification'] ?? null,
+                'password'       => Hash::make($validated['password']),
+                'campus'         => $validated['campus'],
+                'status'         => 'active',
             ]);
 
             DB::commit();
@@ -121,7 +123,6 @@ class TeacherController extends AdminBaseController
     {
         $teacher = Teacher::with('user')->findOrFail($id);
 
-        // Get current location
         $location = $this->getCurrentTeacherLocation($teacher->id);
 
         return view('admin.teachers.show', compact('teacher', 'location'));
@@ -132,7 +133,6 @@ class TeacherController extends AdminBaseController
         try {
             $teacher = Teacher::findOrFail($id);
 
-            // Delete associated user if exists
             if ($teacher->user_id) {
                 User::where('id', $teacher->user_id)->delete();
             }
@@ -148,10 +148,9 @@ class TeacherController extends AdminBaseController
 
     private function getCurrentTeacherLocation($teacherId)
     {
-        $currentDay = now()->format('l');
+        $currentDay  = now()->format('l');
         $currentTime = now()->format('H:i:s');
 
-        // Check scheduled classes
         $schedule = Schedule::where('teacher_id', $teacherId)
             ->where('day_of_week', $currentDay)
             ->where('status', 'active')
@@ -159,8 +158,8 @@ class TeacherController extends AdminBaseController
             ->first();
 
         if ($schedule && $schedule->timeSlot) {
-            $startTime = strtotime($schedule->timeSlot->start_time);
-            $endTime = strtotime($schedule->timeSlot->end_time);
+            $startTime        = strtotime($schedule->timeSlot->start_time);
+            $endTime          = strtotime($schedule->timeSlot->end_time);
             $currentTimestamp = strtotime($currentTime);
 
             if ($currentTimestamp >= ($startTime - 300) && $currentTimestamp <= ($endTime + 300)) {
