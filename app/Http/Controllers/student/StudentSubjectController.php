@@ -11,17 +11,14 @@ use App\Models\Enrollment;
 class StudentSubjectController extends Controller
 {
     public function index(){
-        $student = Auth::user();
-        $studentId = $student->id;
-        $studentCampus = $student->campus;
+        $studentId = Auth::id();
+        $subjects = Subject::with('teachers')->get();
+        $enrolledSubjectIds = Enrollment::where('student_id', $studentId)
+            ->pluck('subject_id')
+            ->toArray();
 
-        $subjects = Subject::with('teachers')
-            ->whereHas('teachers', function ($q) use ($studentCampus) {$q->where('campus', $studentCampus); })->get();
-
-        $enrolledSubjectIds = Enrollment::where('student_id', $studentId)->pluck('subject_id')->toArray();
         foreach ($subjects as $subject) {
             $subject->enrollment_id = in_array($subject->id, $enrolledSubjectIds) ? 1 : null;
-
             if ($subject->teachers->isNotEmpty()) {
                 $subject->teacher_ids = $subject->teachers->pluck('id')->implode(',');
                 $subject->teachers = $subject->teachers->pluck('name')->implode(', ');
@@ -36,17 +33,11 @@ class StudentSubjectController extends Controller
 
     public function enroll(Request $request)
     {
-        $student = Auth::user();
-
-        $subject = Subject::whereHas('teachers', function ($q) use ($student) {
-                $q->where('campus', $student->campus);
-            })
-            ->where('id', $request->subject_id)
-            ->firstOrFail();
+        $studentId = Auth::id();
 
         Enrollment::create([
-            'student_id' => $student->id,
-            'subject_id' => $subject->id,
+            'student_id' => $studentId,
+            'subject_id' => $request->subject_id
         ]);
 
         return back()->with('success', 'Enrolled successfully.');
