@@ -10,24 +10,18 @@ use App\Models\Enrollment;
 
 class StudentSubjectController extends Controller
 {
-    public function index()
-    {
-        $studentId = Auth::id();
+    public function index(){
+        $student = Auth::user();
+        $studentId = $student->id;
+        $studentCampus = $student->campus;
 
-        // Load subjects with teachers
-        $subjects = Subject::with('teachers')->get();
+        $subjects = Subject::with('teachers')
+            ->whereHas('teachers', function ($q) use ($studentCampus) {$q->where('campus', $studentCampus); })->get();
 
-        // Get IDs of subjects the student is already enrolled in
-        $enrolledSubjectIds = Enrollment::where('student_id', $studentId)
-            ->pluck('subject_id')
-            ->toArray();
-
-        // Prepare data for Blade
+        $enrolledSubjectIds = Enrollment::where('student_id', $studentId)->pluck('subject_id')->toArray();
         foreach ($subjects as $subject) {
-            // Mark if enrolled
             $subject->enrollment_id = in_array($subject->id, $enrolledSubjectIds) ? 1 : null;
 
-            // Prepare teacher names and IDs for Blade
             if ($subject->teachers->isNotEmpty()) {
                 $subject->teacher_ids = $subject->teachers->pluck('id')->implode(',');
                 $subject->teachers = $subject->teachers->pluck('name')->implode(', ');
@@ -42,11 +36,17 @@ class StudentSubjectController extends Controller
 
     public function enroll(Request $request)
     {
-        $studentId = Auth::id();
+        $student = Auth::user();
+
+        $subject = Subject::whereHas('teachers', function ($q) use ($student) {
+                $q->where('campus', $student->campus);
+            })
+            ->where('id', $request->subject_id)
+            ->firstOrFail();
 
         Enrollment::create([
-            'student_id' => $studentId,
-            'subject_id' => $request->subject_id
+            'student_id' => $student->id,
+            'subject_id' => $subject->id,
         ]);
 
         return back()->with('success', 'Enrolled successfully.');

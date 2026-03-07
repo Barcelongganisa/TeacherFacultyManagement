@@ -45,20 +45,20 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->name('superadmin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
-    
+
     // User Management
     Route::resource('users', SuperAdminUserController::class);
     Route::post('users/search', [SuperAdminUserController::class, 'search'])->name('users.search');
     Route::post('users/{user}/toggle-status', [SuperAdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::post('users/{user}/reset-password', [SuperAdminUserController::class, 'resetPassword'])->name('users.reset-password');
-    
+
     // Campus Management
     Route::resource('campuses', SuperAdminCampusController::class);
     Route::post('campuses/search', [SuperAdminCampusController::class, 'search'])->name('campuses.search');
-    
+
     // Super Admin Profile
     Route::get('profile', [SuperAdminDashboardController::class, 'editProfile'])->name('profile.edit');
-    
+
     // Campus Assignments
     // Route::get('assignments', [SuperAdminAssignmentController::class, 'index'])->name('assignments.index');
     // Route::post('assignments/assign', [SuperAdminAssignmentController::class, 'assign'])->name('assignments.assign');
@@ -69,7 +69,7 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
     Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');
     Route::post('reservations/{reservation}/approve', [SuperAdminReservationController::class, 'approve'])->name('reservations.approve');
     Route::post('reservations/{reservation}/reject', [SuperAdminReservationController::class, 'reject'])->name('reservations.reject');
-    
+
     // Profile
     Route::get('profile', [SuperAdminProfileController::class, 'edit'])->name('profile.edit');
     Route::post('profile', [SuperAdminProfileController::class, 'update'])->name('profile.update');
@@ -144,7 +144,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
 
     // Schedule
-    Route::get('/schedule', [StudentScheduleController::class, 'index'])->name('schedule'); // ← fixed
+    Route::get('/schedule', [StudentScheduleController::class, 'index'])->name('schedule');
 
     // Subjects
     Route::get('/subjects', [StudentSubjectController::class, 'index'])->name('subjects');

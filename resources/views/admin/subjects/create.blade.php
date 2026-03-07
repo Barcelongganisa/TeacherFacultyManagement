@@ -75,14 +75,10 @@
                                 id="department" 
                                 name="department">
                             <option value="">Select Department</option>
-                            <option value="Computer Science" {{ old('department') == 'Computer Science' ? 'selected' : '' }}>Computer Science</option>
-                            <option value="Mathematics" {{ old('department') == 'Mathematics' ? 'selected' : '' }}>Mathematics</option>
-                            <option value="Physics" {{ old('department') == 'Physics' ? 'selected' : '' }}>Physics</option>
-                            <option value="Chemistry" {{ old('department') == 'Chemistry' ? 'selected' : '' }}>Chemistry</option>
-                            <option value="Biology" {{ old('department') == 'Biology' ? 'selected' : '' }}>Biology</option>
-                            <option value="English" {{ old('department') == 'English' ? 'selected' : '' }}>English</option>
-                            <option value="History" {{ old('department') == 'History' ? 'selected' : '' }}>History</option>
-                            <option value="Business" {{ old('department') == 'Business' ? 'selected' : '' }}>Business</option>
+                            <option value="Computer Science" {{ old('department') == 'BSIT' ? 'selected' : '' }}>BSIT</option>
+                            <option value="Mathematics" {{ old('department') == 'BSCS' ? 'selected' : '' }}>BSCS</option>
+                            <option value="Physics" {{ old('department') == 'BSIS' ? 'selected' : '' }}>BSIS</option>
+                            <option value="Chemistry" {{ old('department') == 'BSEMC' ? 'selected' : '' }}>BSEMC</option>
                         </select>
                         @error('department')
                             <div class="invalid-feedback">{{ $message }}</div>

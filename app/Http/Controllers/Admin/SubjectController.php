@@ -80,6 +80,7 @@ class SubjectController extends AdminBaseController
             'subject_name' => 'required|string',
             'department' => 'nullable|string',
             'description' => 'nullable|string',
+            'campus' => 'nullable|string',
             'credits' => 'nullable|integer|min:1|max:10',
         ]);
 
@@ -91,6 +92,7 @@ class SubjectController extends AdminBaseController
                 'credits' => $request->credits,
                 'status' => 'active',
                 'code' => $request->subject_code,
+                'department' => $request->department,
             ]);
             return redirect()->route('admin.subjects.index')->with('success', 'Subject added successfully!');
         } catch (\Exception $e) {

@@ -52,6 +52,15 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+                 <div class="col-md-6 mb-3">
+                            <label for="add_day_of_week" class="form-label">Day of Week <span class="text-danger">*</span></label>
+                            <select class="form-select" id="add_day_of_week" name="day_of_week" required>
+                                <option value="">Select Day</option>
+                                @foreach($days as $day)
+                                    <option value="{{ $day }}">{{ $day }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                 
                 <div class="col-md-4">
                     <label for="classroom_id" class="form-label">Classroom <span class="text-danger">*</span></label>

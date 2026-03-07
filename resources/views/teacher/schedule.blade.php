@@ -52,7 +52,7 @@
                                     @php $class = $scheduleData[$day][$timeSlot->id]; @endphp
                                     <div class="class-block">
                                         <div class="subject-code">
-                                                <strong>{{ $class->subject_name ?? 'N/A' }}</strong>
+                                                <strong>{{ $class->subject_code ?? 'N/A' }}</strong>
                                             </div>
                                         <div class="room-info">
                                             <small>
@@ -125,7 +125,7 @@
                             ->join('time_slots as ts', 's.time_slot_id', '=', 'ts.id')
                             ->join('subjects as sub', 's.subject_id', '=', 'sub.id')
                             ->join('classrooms as c', 's.classroom_id', '=', 'c.id')
-                            ->where('s.teacher_id', $teacherId)
+                            ->where('s.teacher_id', $userId)
                             ->where('s.status', 'active')
                             ->where('s.day_of_week', now()->format('l'))
                             ->whereTime('ts.start_time', '<=', now()->format('H:i:s'))

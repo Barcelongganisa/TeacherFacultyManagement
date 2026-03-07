@@ -16,7 +16,8 @@ class Teacher extends Model
         'phone',
         'profile_image',
         'password',
-        'status'
+        'status',
+        'campus'
     ];
 
     public function user()
