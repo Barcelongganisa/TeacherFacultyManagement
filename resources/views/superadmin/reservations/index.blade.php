@@ -164,14 +164,14 @@
                         @forelse($reservations ?? [] as $reservation)
                         <tr>
                             <td>
-                                <strong>{{ $reservation->reserved_date->format('M d, Y') }}</strong>
+                                <strong>{{ $reservation->reservation_date ? $reservation->reservation_date->format('M d, Y') : 'N/A' }}</strong>
                                 <br><small class="text-muted">
-                                    {{ date('h:i A', strtotime($reservation->start_time)) }} - 
-                                    {{ date('h:i A', strtotime($reservation->end_time)) }}
+                                    {{ $reservation->start_time ? date('h:i A', strtotime($reservation->start_time)) : 'N/A' }} - 
+                                    {{ $reservation->end_time ? date('h:i A', strtotime($reservation->end_time)) : 'N/A' }}
                                 </small>
                             </td>
                             <td>
-                                <strong>{{ $reservation->classroom->room_number ?? 'N/A' }}</strong>
+                                <strong>{{ $reservation->reservation_date ? date('M d, Y', strtotime($reservation->reservation_date)) : 'N/A' }}</strong>
                                 <br><small class="text-muted">{{ $reservation->classroom->room_name ?? '' }}</small>
                             </td>
                             <td>
@@ -220,7 +220,7 @@
                                                 title="Reject" data-bs-toggle="modal" 
                                                 data-bs-target="#rejectReservationModal"
                                                 data-reservation-id="{{ $reservation->id }}"
-                                                data-reservation-details="{{ $reservation->classroom->room_number ?? '' }} - {{ $reservation->reserved_date->format('M d') }}">
+                                                data-reservation-details="{{ $reservation->classroom->room_number ?? '' }} - {{ $reservation->reservation_date ? $reservation->reservation_date->format('M d') : 'No date' }}">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     @endif

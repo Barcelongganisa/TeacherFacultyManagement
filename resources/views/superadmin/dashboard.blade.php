@@ -2,6 +2,12 @@
 
 @section('title', 'Dashboard - Super Admin')
 
+{{-- <style>
+    html{
+        overflow-y: hidden;
+    }
+</style> --}}
+
 @section('page-header')
     <div class="flex-between">
         <div>
