@@ -23,8 +23,6 @@ class DashboardController extends Controller
         $currentAssignment = $teacher->schedules()
             ->where('status', 'active')
             ->where('day_of_week', date('l'))
-            ->whereTime('start_time', '<=', now()->format('H:i:s'))
-            ->whereTime('end_time', '>=', now()->format('H:i:s'))
             ->with(['subject', 'classroom'])
             ->first();
 

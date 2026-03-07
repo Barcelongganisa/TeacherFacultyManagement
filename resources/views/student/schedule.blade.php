@@ -55,7 +55,7 @@
                                         <td>
                                             <span class="badge" style="background: var(--soft-green); color: var(--primary-green-dark); padding: 0.5rem 1rem; border-radius: 50px;">
                                                 <i class="far fa-clock me-1"></i>
-                                                {{ $schedule->slot_name }}
+                                                {{ $schedule->start_time .' - '. $schedule->end_time }}
                                             </span>
                                         </td>
                                         <td>
@@ -174,9 +174,9 @@
                                     </span>
                                     <div class="mt-2 small">
                                         @foreach($daySchedules as $schedule)
-                                            <div class="text-muted">
+                                           <div class="text-muted">
                                                 <i class="far fa-clock me-1" style="font-size: 0.7rem;"></i>
-                                                {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}
+                                                {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
                                             </div>
                                         @endforeach
                                     </div>
