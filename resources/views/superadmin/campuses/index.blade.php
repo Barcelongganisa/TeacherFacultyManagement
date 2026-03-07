@@ -137,11 +137,11 @@
                                         @endif
                                     </small>
                                 @else
-                                    <span class="text-muted">—</span>
+                                    <span class="badge bg-info">{{ $campus->classrooms_count ?? 0 }}</span>
                                 @endif
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-primary">{{ $campus->users_count ?? 0 }}</span>
+                                <span class="badge bg-primary">{{ $campus->admins_count ?? 0 }}</span>
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-info">{{ $campus->classrooms_count ?? 0 }}</span>

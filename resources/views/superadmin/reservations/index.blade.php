@@ -385,5 +385,52 @@
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    function exportReservations() {
+    // Prepare CSV headers
+    const headers = ['Date', 'Time', 'Room', 'Campus', 'Purpose', 'Reserved By', 'Email', 'Status', 'Rejection Reason'];
+    let csvContent = headers.join(',') + '\n';
+    
+    // Loop through table rows
+    const rows = document.querySelectorAll('table tbody tr');
+    rows.forEach(row => {
+        // Skip empty rows
+        if (row.querySelectorAll('td').length === 1) return;
+        
+        const cols = row.querySelectorAll('td');
+        const dateTime = cols[0].innerText.replace(/\n/g, ' ');
+        const room = cols[1].innerText.replace(/\n/g, ' ');
+        const campus = cols[2].innerText.replace(/\n/g, ' ');
+        const purpose = cols[3].innerText.replace(/\n/g, ' ');
+        const reservedBy = cols[4].querySelector('strong')?.innerText || '';
+        const email = cols[4].querySelector('small')?.innerText || '';
+        const status = cols[5].innerText.replace(/\n/g, ' ');
+        const rejectionReason = cols[5].querySelector('small')?.getAttribute('title') || '';
+        
+        const rowData = [
+            `"${dateTime}"`,
+            `"${room}"`,
+            `"${campus}"`,
+            `"${purpose}"`,
+            `"${reservedBy}"`,
+            `"${email}"`,
+            `"${status}"`,
+            `"${rejectionReason}"`
+        ];
+        csvContent += rowData.join(',') + '\n';
+    });
+
+    // Create CSV and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    const fileName = 'Room_Reservations_' + new Date().toISOString().split('T')[0] + '.csv';
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
 </script>
 @endpush

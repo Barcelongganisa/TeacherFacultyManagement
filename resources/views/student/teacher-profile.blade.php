@@ -26,13 +26,13 @@
                         @else
                             <div class="bg-primary text-white rounded-circle mx-auto d-flex align-items-center justify-content-center" 
                                  style="width: 120px; height: 120px; font-size: 36px; font-weight: bold;">
-                                {{ strtoupper(substr($teacher->first_name, 0, 1) . substr($teacher->last_name, 0, 1)) }}
+                                {{ strtoupper(substr($teacher->name, 0, 1)) }}
                             </div>
                         @endif
                     </div>
                     
                     <!-- Name and Title -->
-                    <h4 class="card-title mb-1">{{ $teacher->first_name }} {{ $teacher->last_name }}</h4>
+                    <h4 class="card-title mb-1">{{ $teacher->name }}</h4>
                     <p class="text-muted mb-2">Teacher</p>
                     <span class="badge {{ $teacher->status == 'active' ? 'bg-success' : ($teacher->status == 'inactive' ? 'bg-secondary' : 'bg-warning') }}">
                         {{ ucfirst($teacher->status) }}
@@ -78,14 +78,15 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="fw-bold text-muted">Current Location:</label>
-                                <p class="mb-0">
-                                    <i class="fas fa-map-marker-alt"></i> 
-                                    @if($currentLocation !== '-')
-                                        <span class="badge bg-success">{{ $currentLocation }}</span>
-                                    @else
-                                        <span class="text-muted">Not currently in class</span>
-                                    @endif
-                                </p>
+                                @if(isset($currentLocation) && $currentLocation !== '-')
+                                    <p class="mb-0">
+                                        <i class="fas fa-map-marker-alt"></i> Location: {{ $currentLocation }}
+                                    </p>
+                                @else
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-map-marker-alt"></i> Not currently in class
+                                    </p>
+                                @endif
                             </div>
                         </div>
                     </div>

@@ -173,10 +173,6 @@
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
             @endauth
-
-            <a href="#" class="btn-docs" onclick="alert('Documentation coming soon!')">
-                <i class="fas fa-book"></i> Documentation
-            </a>
         </div>
     </div>
 

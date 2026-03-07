@@ -323,7 +323,7 @@ $displayName = $teacher->name ?? $user->name ?? 'Teacher';
         @if($user->role)
             <span class="department-badge">{{ ucfirst($user->role) }}</span>
         @endif
-        <span class="role-badge" style="margin-top: 10px;">Professor</span>
+        <span class="role-badge" style="margin-top: 10px;">{{ $user->campus }}</span>
     </div>
 
     <!-- Main Navigation Menu -->

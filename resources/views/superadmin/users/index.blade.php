@@ -87,7 +87,7 @@
                                          class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
                                     <div>
                                         <strong>{{ $user->name }}</strong>
-                                        <br><small class="text-muted">@ {{ $user->username ?? 'N/A' }}</small>
+                                        <br><small class="text-muted">@ {{ $user->email ?? 'N/A' }}</small>
                                     </div>
                                 </div>
                             </td>
@@ -99,8 +99,8 @@
                             </td>
                             <td>
                                 @if($user->campus)
-                                    <span class="badge bg-purple">{{ $user->campus->campus_code }}</span>
-                                    <small class="d-block text-muted">{{ $user->campus->campus_name }}</small>
+                                    <span class="badge bg-purple">{{ $user->campus }}</span>
+                                    <small class="d-block text-muted">{{ $user->campus }}</small>
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif

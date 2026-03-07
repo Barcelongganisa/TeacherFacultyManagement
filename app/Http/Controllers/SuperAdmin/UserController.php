@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Campus;
 use Illuminate\Http\Request;
+use App\Models\Teacher;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -51,6 +53,7 @@ class UserController extends Controller
             'password' => 'required|min:8|confirmed',
             'role' => 'required|in:super_admin,admin,teacher,student',
             'campus_id' => 'nullable|exists:campuses,id',
+            'campus' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
@@ -61,11 +64,45 @@ class UserController extends Controller
             $validated['profile_image'] = $path;
         }
 
-        // Hash the password
+        // Hash password
         $validated['password'] = Hash::make($validated['password']);
 
-        // Create the user
-        User::create($validated);
+        // Get campus name
+        if ($request->filled('campus_id')) {
+            $campus = Campus::find($request->campus_id);
+
+            if ($campus) {
+                $validated['campus'] = str_replace(
+                    'University Of Caloocan City - ',
+                    '',
+                    $campus->campus_name
+                );
+            } else {
+                $validated['campus'] = null;
+            }
+        } else {
+            $validated['campus'] = null;
+        }
+
+        // Create user
+        $user = User::create($validated);
+
+        if ($validated['role'] === 'teacher') {
+
+            Teacher::create([
+                'employee_id' => 'EMP-' . strtoupper(Str::random(6)),
+                'user_id' => $user->id,
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'profile_image' => $validated['profile_image'] ?? null,
+                'password' => $validated['password'],
+                'status' => $validated['status'],
+                'campus' => $validated['campus'],
+                'department' => $request->department ?? null,
+                'specialization' => $request->specialization ?? null,
+                'phone' => $request->phone ?? null,
+            ]);
+        }
 
         return redirect()->route('superadmin.users.index')
             ->with('success', 'User created successfully.');
@@ -115,6 +152,22 @@ class UserController extends Controller
             // Store new image
             $path = $request->file('profile_image')->store('profile-images', 'public');
             $validated['profile_image'] = $path;
+        }
+
+        if ($request->filled('campus_id')) {
+            $campus = Campus::find($request->campus_id);
+
+            if ($campus) {
+                $validated['campus'] = str_replace(
+                    'University Of Caloocan City - ',
+                    '',
+                    $campus->campus_name
+                );
+            } else {
+                $validated['campus'] = null;
+            }
+        } else {
+            $validated['campus'] = null;
         }
 
         // 5️⃣ Update user

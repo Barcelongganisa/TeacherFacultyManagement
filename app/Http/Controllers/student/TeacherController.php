@@ -39,10 +39,21 @@ class TeacherController extends Controller
     return response()->json($teachers);
 }
 
-  public function show($id){
+public function show($id)
+{
     $teacher = DB::table('teachers')->join('users', 'teachers.user_id', '=', 'users.id')
-        ->select('teachers.id','teachers.employee_id','teachers.department',
-            'teachers.specialization','teachers.phone','users.name','users.email','users.profile_image','users.status','users.role')
+        ->select(
+            'teachers.id',
+            'teachers.employee_id',
+            'teachers.department',
+            'teachers.specialization',
+            'teachers.phone',
+            'users.name',
+            'users.email',
+            'users.profile_image',
+            'users.status',
+            'users.role'
+        )
         ->where('teachers.id', $id)
         ->where('users.role', 'teacher')
         ->first();
@@ -51,6 +62,32 @@ class TeacherController extends Controller
         abort(404, 'Teacher not found.');
     }
 
-    return view('student.teacher-profile', compact('teacher'));
+    // Fetch subjects for this teacher
+    $subjects = DB::table('subjects')
+        ->where('teacher_id', $id)
+        ->get();
+
+    // Fetch today's schedule (optional, adjust table/columns as needed)
+$todaySchedule = DB::table('schedules')
+    ->join('subjects', 'schedules.subject_id', '=', 'subjects.id')
+    ->join('rooms', 'schedules.classroom_id', '=', 'rooms.id') // classroom_id, not room_id
+    ->select(
+        'schedules.id',
+        'schedules.date',
+        'schedules.created_at',
+        'schedules.updated_at',
+        'subjects.subject_name',
+        'subjects.subject_code',
+        'rooms.room_name',
+        'rooms.room_number'
+    )
+    ->where('schedules.teacher_id', $id)
+    ->whereDate('schedules.date', now())
+    ->get();
+
+    // Current location (if you have a tracking system; else just default)
+    $currentLocation = '-'; // or fetch dynamically if you track attendance/location
+
+    return view('student.teacher-profile', compact('teacher', 'subjects', 'todaySchedule', 'currentLocation'));
 }
 }
