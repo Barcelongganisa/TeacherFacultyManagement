@@ -97,11 +97,9 @@ class CampusController extends Controller
     {
         // Load relationships with counts
         $campus->load([
-            'users' => function($q) {
-                $q->where('role', 'admin')->with('campus');
-            },
-            'classrooms' => function($q) {
-                $q->withCount('reservations');
+            'admins',
+            'classrooms' => function ($query) {
+                $query->withCount('reservations');
             }
         ]);
         
@@ -118,6 +116,14 @@ class CampusController extends Controller
             ->latest()
             ->take(10)
             ->get();
+
+        $campus->loadCount([
+            'admins',
+            'teachers',
+            'students',
+            'classrooms',
+            'reservations'
+        ]);
         
         return view('superadmin.campuses.show', compact(
             'campus', 

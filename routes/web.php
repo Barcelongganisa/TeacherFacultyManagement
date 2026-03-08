@@ -59,11 +59,8 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
     // Super Admin Profile
     Route::get('profile', [SuperAdminDashboardController::class, 'editProfile'])->name('profile.edit');
 
-    // Campus Assignments
-    // Route::get('assignments', [SuperAdminAssignmentController::class, 'index'])->name('assignments.index');
-    // Route::post('assignments/assign', [SuperAdminAssignmentController::class, 'assign'])->name('assignments.assign');
-    // Route::delete('assignments/{assignment}', [SuperAdminAssignmentController::class, 'remove'])->name('assignments.remove');
-    // Route::post('assignments/bulk-assign', [SuperAdminAssignmentController::class, 'bulkAssign'])->name('assignments.bulk-assign');
+    Route::get('/reservations/{reservation}', [SuperAdminReservationController::class, 'show'])
+        ->name('reservations.show');
 
     // Reservations (global view)
     Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');

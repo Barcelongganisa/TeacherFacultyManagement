@@ -34,13 +34,22 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('role');
             
-        // Campus overview with counts
-        $campuses = Campus::withCount(['users' => function($q) {
-                $q->where('role', 'admin');
-            }, 'classrooms'])
-            ->where('status', 'active')
+        $campuses = Campus::where('status', 'active')
+            ->withCount([
+                'users as admins_count' => function ($q) {
+                    $q->where('role', 'admin');
+                },
+                'users as teachers_count' => function ($q) {
+                    $q->where('role', 'teacher');
+                },
+                'users as students_count' => function ($q) {
+                    $q->where('role', 'student');
+                },
+                'classrooms',
+                'reservations'
+            ])
             ->get();
-            
+        
         return view('superadmin.dashboard', compact(
             'totalCampuses',
             'totalUsers',
