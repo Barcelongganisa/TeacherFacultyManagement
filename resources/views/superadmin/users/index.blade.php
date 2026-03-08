@@ -93,7 +93,7 @@
                             </td>
                             <td>{{ $user->email }}</td>
                             <td>
-                                <span class="badge bg-{{ $user->role === 'super_admin' ? 'warning' : ($user->role === 'admin' ? 'primary' : ($user->role === 'teacher' ? 'info' : 'success')) }}">
+                                <span class="badge bg-{{ $user->role === 'superadmin' ? 'danger' : ($user->role === 'admin' ? 'primary' : ($user->role === 'teacher' ? 'info' : 'success')) }}">
                                     {{ ucfirst(str_replace('_', ' ', $user->role)) }}
                                 </span>
                             </td>

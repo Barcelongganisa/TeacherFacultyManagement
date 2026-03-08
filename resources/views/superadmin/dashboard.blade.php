@@ -170,7 +170,7 @@
                                 <tr>
                                     <td><strong>{{ $campus->campus_name }}</strong></td>
                                     <td><code>{{ $campus->campus_code }}</code></td>
-                                    <td class="text-center">{{ $campus->users_count ?? 0 }}</td>
+                                    <td class="text-center">{{ $campus->admins_count ?? 0 }}</td>
                                     <td class="text-center">{{ $campus->teachers_count ?? 0 }}</td>
                                     <td class="text-center">{{ $campus->students_count ?? 0 }}</td>
                                     <td class="text-center">{{ $campus->classrooms_count ?? 0 }}</td>

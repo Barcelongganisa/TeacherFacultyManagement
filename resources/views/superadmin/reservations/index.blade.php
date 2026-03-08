@@ -153,7 +153,7 @@
                         <tr>
                             <th>Date & Time</th>
                             <th>Room</th>
-                            <th>Campus</th>
+                            <th>Room Campus</th>
                             <th>Purpose</th>
                             <th>Reserved By</th>
                             <th>Status</th>
@@ -165,14 +165,20 @@
                         <tr>
                             <td>
                                 <strong>{{ $reservation->reservation_date ? $reservation->reservation_date->format('M d, Y') : 'N/A' }}</strong>
-                                <br><small class="text-muted">
-                                    {{ $reservation->start_time ? date('h:i A', strtotime($reservation->start_time)) : 'N/A' }} - 
-                                    {{ $reservation->end_time ? date('h:i A', strtotime($reservation->end_time)) : 'N/A' }}
-                                </small>
+                                @if($reservation->timeSlot)
+                                    <br><small class="text-muted">
+                                        {{ \Carbon\Carbon::parse($reservation->timeSlot->start_time)->format('h:i A') }} - 
+                                        {{ \Carbon\Carbon::parse($reservation->timeSlot->end_time)->format('h:i A') }}
+                                    </small>
+                                @else
+                                    <br><small class="text-muted text-danger">No time slot assigned</small>
+                                @endif
                             </td>
                             <td>
-                                <strong>{{ $reservation->reservation_date ? date('M d, Y', strtotime($reservation->reservation_date)) : 'N/A' }}</strong>
-                                <br><small class="text-muted">{{ $reservation->classroom->room_name ?? '' }}</small>
+                                <strong>{{ $reservation->classroom->room_number ?? 'N/A' }}</strong>
+                                @if($reservation->classroom->room_name)
+                                    <br><small class="text-muted">{{ $reservation->classroom->room_name }}</small>
+                                @endif
                             </td>
                             <td>
                                 <span class="badge bg-purple">{{ $reservation->classroom->campus->campus_code ?? 'N/A' }}</span>
@@ -182,10 +188,22 @@
                                 <div data-bs-toggle="tooltip" title="{{ $reservation->purpose }}">
                                     {{ Str::limit($reservation->purpose, 30) }}
                                 </div>
+                                @if($reservation->notes)
+                                    <br><small class="text-muted" data-bs-toggle="tooltip" title="Notes: {{ $reservation->notes }}">
+                                        <i class="fas fa-sticky-note"></i>
+                                    </small>
+                                @endif
                             </td>
                             <td>
-                                <strong>{{ $reservation->user->name ?? 'N/A' }}</strong>
-                                <br><small class="text-muted">{{ $reservation->user->email ?? '' }}</small>
+                                <div class="d-flex flex-column">
+                                    <strong>{{ $reservation->teacher->user->name ?? 'N/A' }}</strong>
+                                    <small class="text-muted">{{ $reservation->teacher->user->email ?? '' }}</small>
+                                    <small class="text-muted">
+                                        {{ $reservation->teacher->campus ?? '' }}
+                                    </small>
+                                    @if($reservation->teacher && $reservation->teacher->campus) 
+                                    @endif
+                                </div>
                             </td>
                             <td>
                                 <span class="badge bg-{{ $reservation->status === 'approved' ? 'success' : ($reservation->status === 'pending' ? 'warning' : ($reservation->status === 'rejected' ? 'danger' : 'secondary')) }}">
@@ -201,8 +219,7 @@
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <button type="button" class="btn btn-outline-info" title="View Details"
-                                            data-bs-toggle="modal" data-bs-target="#viewReservationModal"
-                                            data-reservation="{{ json_encode($reservation) }}">
+                                            onclick="viewReservation({{ $reservation->id }})">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     
@@ -217,10 +234,7 @@
                                         </form>
                                         
                                         <button type="button" class="btn btn-outline-danger" 
-                                                title="Reject" data-bs-toggle="modal" 
-                                                data-bs-target="#rejectReservationModal"
-                                                data-reservation-id="{{ $reservation->id }}"
-                                                data-reservation-details="{{ $reservation->classroom->room_number ?? '' }} - {{ $reservation->reservation_date ? $reservation->reservation_date->format('M d') : 'No date' }}">
+                                                title="Reject" onclick="showRejectModal({{ $reservation->id }}, '{{ $reservation->classroom->room_number ?? '' }} - {{ $reservation->reservation_date ? $reservation->reservation_date->format('M d') : 'No date' }}')">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     @endif
@@ -256,7 +270,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="reservationDetails">
-                <!-- Dynamic content -->
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -296,141 +314,187 @@
 @push('scripts')
 <script>
     // View Reservation Modal
-    $('#viewReservationModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var reservation = button.data('reservation');
-        var modal = $(this);
+    function viewReservation(id) {
+        $('#viewReservationModal').modal('show');
+        $('#reservationDetails').html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
         
-        var detailsHtml = `
-            <div class="row">
-                <div class="col-md-6">
-                    <table class="table table-sm">
-                        <tr>
-                            <th>Date:</th>
-                            <td>${new Date(reservation.reserved_date).toLocaleDateString()}</td>
-                        </tr>
-                        <tr>
-                            <th>Time:</th>
-                            <td>${reservation.start_time} - ${reservation.end_time}</td>
-                        </tr>
-                        <tr>
-                            <th>Room:</th>
-                            <td>${reservation.classroom.room_number} - ${reservation.classroom.room_name}</td>
-                        </tr>
-                        <tr>
-                            <th>Campus:</th>
-                            <td>${reservation.classroom.campus.campus_name}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table table-sm">
-                        <tr>
-                            <th>Reserved By:</th>
-                            <td>${reservation.user.name}</td>
-                        </tr>
-                        <tr>
-                            <th>Email:</th>
-                            <td>${reservation.user.email}</td>
-                        </tr>
-                        <tr>
-                            <th>Status:</th>
-                            <td><span class="badge bg-${reservation.status === 'approved' ? 'success' : (reservation.status === 'pending' ? 'warning' : 'danger')}">${reservation.status}</span></td>
-                        </tr>
-                        <tr>
-                            <th>Created:</th>
-                            <td>${new Date(reservation.created_at).toLocaleString()}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-12">
-                    <h6>Purpose:</h6>
-                    <p class="border p-3 rounded">${reservation.purpose}</p>
-                </div>
-            </div>
-            ${reservation.rejection_reason ? `
-            <div class="row mt-3">
-                <div class="col-12">
-                    <h6 class="text-danger">Rejection Reason:</h6>
-                    <p class="border border-danger p-3 rounded">${reservation.rejection_reason}</p>
-                </div>
-            </div>
-            ` : ''}
-        `;
-        
-        modal.find('#reservationDetails').html(detailsHtml);
-    });
+        fetch(`/super-admin/reservations/${id}`)
+            .then(response => response.json())
+            .then(reservation => {
+                let detailsHtml = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th style="width: 40%">Date:</th>
+                                    <td>${new Date(reservation.reservation_date).toLocaleDateString()}</td>
+                                </tr>
+                                <tr>
+                                    <th>Time:</th>
+                                    <td>${reservation.time_slot ? reservation.time_slot.full : 'N/A'}</td>
+                                </tr>
+                                <tr>
+                                    <th>Room:</th>
+                                    <td>${reservation.classroom.room_number} ${reservation.classroom.room_name ? '- ' + reservation.classroom.room_name : ''}</td>
+                                </tr>
+                                <tr>
+                                    <th>Room Campus:</th>
+                                    <td>${reservation.classroom.campus ? reservation.classroom.campus.name : 'N/A'}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th style="width: 40%">Reserved By:</th>
+                                    <td>${reservation.user.name}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td>${reservation.user.email}</td>
+                                </tr>
+                                <tr>
+                                    <th>User Campus:</th>
+                                    <td>${reservation.user.campus ? reservation.user.campus.name : 'N/A'}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td><span class="badge bg-${reservation.status === 'approved' ? 'success' : (reservation.status === 'pending' ? 'warning' : (reservation.status === 'rejected' ? 'danger' : 'secondary'))}">${reservation.status}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Created:</th>
+                                    <td>${new Date(reservation.created_at).toLocaleString()}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Purpose:</h6>
+                            <p class="border p-3 rounded bg-light">${reservation.purpose}</p>
+                        </div>
+                    </div>`;
+                
+                if (reservation.notes) {
+                    detailsHtml += `
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <h6>Notes:</h6>
+                            <p class="border p-3 rounded bg-light">${reservation.notes}</p>
+                        </div>
+                    </div>`;
+                }
+                
+                if (reservation.rejection_reason) {
+                    detailsHtml += `
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <h6 class="text-danger">Rejection Reason:</h6>
+                            <p class="border border-danger p-3 rounded bg-light">${reservation.rejection_reason}</p>
+                        </div>
+                    </div>`;
+                }
+                
+                if (reservation.approved_by) {
+                    detailsHtml += `
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <h6 class="text-success">Approved By:</h6>
+                            <p class="border border-success p-3 rounded bg-light">
+                                ${reservation.approved_by.name} on ${new Date(reservation.approved_at).toLocaleString()}
+                            </p>
+                        </div>
+                    </div>`;
+                }
+                
+                $('#reservationDetails').html(detailsHtml);
+            })
+            .catch(error => {
+                $('#reservationDetails').html('<div class="alert alert-danger">Error loading reservation details.</div>');
+                console.error('Error:', error);
+            });
+    }
     
     // Reject Reservation Modal
-    $('#rejectReservationModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var reservationId = button.data('reservation-id');
-        var reservationDetails = button.data('reservation-details');
-        var modal = $(this);
-        
-        modal.find('#rejectReservationDetails').text(reservationDetails);
-        modal.find('#rejectReservationForm').attr('action', `/super-admin/reservations/${reservationId}/reject`);
-    });
+    function showRejectModal(id, details) {
+        $('#rejectReservationDetails').text(details);
+        $('#rejectReservationForm').attr('action', `/super-admin/reservations/${id}/reject`);
+        $('#rejectReservationModal').modal('show');
+    }
     
     // Export function
     function exportReservations() {
-        const params = new URLSearchParams(window.location.search);
-        window.location.href = '{{ route("superadmin.reservations.index") }}/export?' + params.toString();
+        // Prepare CSV headers
+        const headers = ['Date', 'Time', 'Room', 'Room Campus', 'Purpose', 'Reserved By', 'Email', 'User Campus', 'Status', 'Rejection Reason'];
+        let csvContent = headers.join(',') + '\n';
+        
+        // Loop through table rows
+        const rows = document.querySelectorAll('table tbody tr');
+        rows.forEach(row => {
+            // Skip empty rows
+            if (row.querySelectorAll('td').length === 1) return;
+            
+            const cols = row.querySelectorAll('td');
+            
+            // Extract date and time
+            const dateTimeElement = cols[0];
+            const date = dateTimeElement.querySelector('strong')?.innerText || '';
+            const time = dateTimeElement.querySelector('small')?.innerText || '';
+            
+            // Room
+            const room = cols[1].innerText.replace(/\n/g, ' ').trim();
+            
+            // Room Campus
+            const roomCampus = cols[2].innerText.replace(/\n/g, ' ').trim();
+            
+            // Purpose
+            const purpose = cols[3].innerText.replace(/\n/g, ' ').trim();
+            
+            // User details
+            const userDiv = cols[4];
+            const userName = userDiv.querySelector('strong')?.innerText || '';
+            const userEmail = userDiv.querySelector('small')?.innerText || '';
+            const userCampus = userDiv.querySelector('small:last-child')?.innerText.replace('📍', '').trim() || '';
+            
+            // Status
+            const statusDiv = cols[5];
+            const status = statusDiv.querySelector('.badge')?.innerText || '';
+            const rejectionReason = statusDiv.querySelector('small')?.getAttribute('title') || '';
+            
+            const rowData = [
+                `"${date}"`,
+                `"${time}"`,
+                `"${room}"`,
+                `"${roomCampus}"`,
+                `"${purpose}"`,
+                `"${userName}"`,
+                `"${userEmail}"`,
+                `"${userCampus}"`,
+                `"${status}"`,
+                `"${rejectionReason}"`
+            ];
+            csvContent += rowData.join(',') + '\n';
+        });
+
+        // Create CSV and trigger download
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        const fileName = 'Room_Reservations_' + new Date().toISOString().split('T')[0] + '.csv';
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
     
     // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     });
-
-    function exportReservations() {
-    // Prepare CSV headers
-    const headers = ['Date', 'Time', 'Room', 'Campus', 'Purpose', 'Reserved By', 'Email', 'Status', 'Rejection Reason'];
-    let csvContent = headers.join(',') + '\n';
-    
-    // Loop through table rows
-    const rows = document.querySelectorAll('table tbody tr');
-    rows.forEach(row => {
-        // Skip empty rows
-        if (row.querySelectorAll('td').length === 1) return;
-        
-        const cols = row.querySelectorAll('td');
-        const dateTime = cols[0].innerText.replace(/\n/g, ' ');
-        const room = cols[1].innerText.replace(/\n/g, ' ');
-        const campus = cols[2].innerText.replace(/\n/g, ' ');
-        const purpose = cols[3].innerText.replace(/\n/g, ' ');
-        const reservedBy = cols[4].querySelector('strong')?.innerText || '';
-        const email = cols[4].querySelector('small')?.innerText || '';
-        const status = cols[5].innerText.replace(/\n/g, ' ');
-        const rejectionReason = cols[5].querySelector('small')?.getAttribute('title') || '';
-        
-        const rowData = [
-            `"${dateTime}"`,
-            `"${room}"`,
-            `"${campus}"`,
-            `"${purpose}"`,
-            `"${reservedBy}"`,
-            `"${email}"`,
-            `"${status}"`,
-            `"${rejectionReason}"`
-        ];
-        csvContent += rowData.join(',') + '\n';
-    });
-
-    // Create CSV and trigger download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    const fileName = 'Room_Reservations_' + new Date().toISOString().split('T')[0] + '.csv';
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
 </script>
 @endpush

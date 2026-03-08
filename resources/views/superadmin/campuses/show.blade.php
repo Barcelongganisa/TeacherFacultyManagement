@@ -112,7 +112,20 @@
                             <tbody>
                                 @forelse($campus->admins ?? [] as $admin)
                                 <tr>
-                                    <td>{{ $admin->name }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ $admin->profile_image ? asset('storage/'.$admin->profile_image) : asset('images/default-avatar.png') }}"
+                                                class="rounded-circle me-2"
+                                                width="40"
+                                                height="40"
+                                                style="object-fit: cover;">
+
+                                            <div>
+                                                <div class="fw-bold">{{ $admin->name }}</div>
+                                                <small class="text-muted">{{ $admin->email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>{{ $admin->email }}</td>
                                     <td>
                                         <span class="badge bg-{{ $admin->status === 'active' ? 'success' : 'secondary' }}">
