@@ -86,9 +86,8 @@
                 <thead class="bg-light">
                     <tr>
                         <th>ID</th>
-                        <th>Username</th>
+                        <th>Name</th>
                         <th>Email</th>
-                        <th>Campus</th>
                         <th>Status</th>
                         <th>Created At</th>
                         <th class="text-end">Actions</th>
@@ -101,13 +100,12 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-circle bg-success text-white me-2">
-                                        {{ substr($student->username, 0, 2) }}
+                                        {{ substr($student->name, 0, 2) }}
                                     </div>
-                                    <strong>{{ $student->username }}</strong>
+                                    <strong>{{ $student->name }}</strong>
                                 </div>
                             </td>
                             <td>{{ $student->email }}</td>
-                            <td>{{ $student->campus }}</td>
                             <td>
                                 <span class="badge bg-{{ $student->status === 'active' ? 'success' : 'danger' }}">
                                     {{ ucfirst($student->status) }}

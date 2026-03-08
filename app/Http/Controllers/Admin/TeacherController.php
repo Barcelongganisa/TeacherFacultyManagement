@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherController extends AdminBaseController
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $userCourse = $request->user();
         $search = $request->get('search', '');
         $status = $request->get('status', '');
@@ -32,7 +33,7 @@ class TeacherController extends AdminBaseController
             $query->where('status', $status);
         }
 
-        $teachers = $query->orderBy('created_at', 'desc')->where('course_id',$userCourse->course_id)->paginate(15);
+        $teachers = $query->orderBy('created_at', 'desc')->where('course_id', $userCourse->course_id)->paginate(15);
 
         return view('admin.teachers.index', compact('teachers', 'search', 'status'));
     }
@@ -64,52 +65,62 @@ class TeacherController extends AdminBaseController
 
     public function create()
     {
-        return view('admin.teachers.create');
+        $campuses    = DB::table('campuses')->orderBy('campus_name')->get();
+        $departments = DB::table('departments')->orderBy('name')->get();
+        $courses     = DB::table('courses')->orderBy('name')->get();
+        return view('admin.teachers.create', compact('campuses', 'departments', 'courses'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'employee_id'   => 'required|string|unique:teachers,employee_id',
-            'email'         => 'required|email|unique:users,email|unique:teachers,email',
-            'password'      => 'required|string|min:8',
-            'first_name'    => 'required|string',
-            'last_name'     => 'required|string',
-            'phone'         => 'nullable|string',
-            'campus'        => 'required|string',
-            'department'    => 'nullable|string',
+            'email' => 'required|email|unique:users,email|unique:teachers,email',
+            'password' => 'required|string|min:8',
+            'first_name'  => 'required|string',
+            'last_name' => 'required|string',
+            'phone'   => 'nullable|string',
+            'campus_id'  => 'required|exists:campuses,id',      
+            'department_id' => 'nullable|exists:departments,id',   
+            'course_id'   => 'nullable|exists:courses,id',       
             'qualification' => 'nullable|string',
-            'hire_date'     => 'nullable|date',
-            'bio'           => 'nullable|string',
+            'hire_date' => 'nullable|date',
+            'bio'  => 'nullable|string',
+            'status'  => 'nullable|in:active,inactive,on_leave',
         ]);
 
         DB::beginTransaction();
 
         try {
             $user = User::create([
-                'name'     => $validated['first_name'] . ' ' . $validated['last_name'],
-                'email'    => $validated['email'],
+                'name'  => $validated['first_name'] . ' ' . $validated['last_name'],
+                'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role'     => 'teacher',
-                'status'   => 'active',
-                'campus'         => $validated['campus'],
+                'role'  => 'teacher',
+                'status' => $validated['status'] ?? 'active',
+                'phone' => $validated['phone'] ?? null,
+                'campus_id' => $validated['campus_id'],        
+                'department_id' => $validated['department_id'] ?? null, 
+                'course_id' => $validated['course_id'] ?? null,     
             ]);
 
             Teacher::create([
-                'user_id'        => $user->id,
-                'employee_id'    => $validated['employee_id'],
-                'name'           => $validated['first_name'] . ' ' . $validated['last_name'],
-                'email'          => $validated['email'],
-                'phone'          => $validated['phone'] ?? null,
-                'department'     => $validated['department'] ?? null,
+                'user_id'=> $user->id,
+                'employee_id' => $validated['employee_id'],
+                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'phone' => $validated['phone'] ?? null,
+                'campus_id' => $validated['campus_id'],       
+                'department_id' => $validated['department_id'] ?? null, 
+                'course_id' => $validated['course_id'] ?? null,     
                 'specialization' => $validated['qualification'] ?? null,
-                'password'       => Hash::make($validated['password']),
-                'campus'         => $validated['campus'],
-                'status'         => 'active',
+                'hire_date' => $validated['hire_date'] ?? null,
+                'bio' => $validated['bio'] ?? null,
+                'status'=> $validated['status'] ?? 'active',
             ]);
 
             DB::commit();
-
             return redirect()->route('admin.teachers.index')
                 ->with('success', 'Teacher added successfully!');
         } catch (\Exception $e) {

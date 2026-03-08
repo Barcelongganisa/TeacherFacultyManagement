@@ -1,6 +1,6 @@
 @php
 $user = auth()->user();
-
+$campuses = DB::table('campuses')->where('id',$user->campus_id)->value('campus_name');
 $profileImageUrl = $user->profile_image
     ? asset('storage/' . $user->profile_image)
     : asset('assets/img/default-avatar.png');
@@ -390,7 +390,7 @@ $displayName = $user->name ?? $user->username ?? 'Administrator';
         @if($user->role)
             <span class="department-badge">{{ ucfirst($user->role) }}</span>
         @endif
-        <span class="role-badge">{{ $user->campus }}</span>
+        <span class="role-badge">{{ $campuses }}</span>
     </div>
 
     <!-- Main Navigation Menu -->

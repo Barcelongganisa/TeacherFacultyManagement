@@ -67,8 +67,8 @@
                         <option value="">All</option>
                         @foreach($departments as $dept)
                             @if($dept)
-                                <option value="{{ $dept }}" {{ request('department') == $dept ? 'selected' : '' }}>
-                                    {{ $dept }}
+                               <option value="{{ $dept->id }}" {{ request('department') == $dept->id ? 'selected' : '' }}>
+                                    {{ $dept->name }}
                                 </option>
                             @endif
                         @endforeach

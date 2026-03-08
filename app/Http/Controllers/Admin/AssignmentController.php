@@ -10,29 +10,34 @@ use Illuminate\Support\Facades\DB;
 
 class AssignmentController extends AdminBaseController
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $user = $request->user();
-        $search = $request->get('search', '');
-        $year = $request->get('year', '');
-        $semester = $request->get('semester', '');
-        $status = $request->get('status', '');
+
+        $search     = $request->get('search', '');
+        $year       = $request->get('year', '');
+        $semester   = $request->get('semester', '');
+        $status     = $request->get('status', '');
         $department = $request->get('department', '');
 
         $query = DB::table('teacher_subjects')
             ->join('teachers', 'teacher_subjects.teacher_id', '=', 'teachers.id')
             ->join('subjects', 'teacher_subjects.subject_id', '=', 'subjects.id')
-            ->where('subjects.course_id',$user)
-            ->select( 'teacher_subjects.*','teachers.name','teachers.department', 'subjects.subject_name','subjects.subject_code')
+            ->join('courses', 'subjects.course_id', '=', 'courses.id')
+            ->join('departments', 'courses.department_id', '=', 'departments.id')
+            ->select('teacher_subjects.*','teachers.name',
+                'teachers.department','subjects.subject_name','subjects.subject_code')
+            ->where('departments.campus_id', $user->campus_id) 
             ->orderBy('teacher_subjects.id', 'desc');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('teachers.first_name', 'like', "%{$search}%")
-                    ->orWhere('teachers.last_name', 'like', "%{$search}%")
+                $q->where('teachers.name', 'like', "%{$search}%")
                     ->orWhere('subjects.subject_name', 'like', "%{$search}%")
                     ->orWhere('subjects.subject_code', 'like', "%{$search}%");
             });
         }
+
         if ($year) {
             $query->where('teacher_subjects.academic_year', $year);
         }
@@ -46,15 +51,20 @@ class AssignmentController extends AdminBaseController
         }
 
         if ($department) {
-            $query->where('teachers.department', $department);
+            $query->where('departments.id', $department);
         }
 
         $assignments = $query->paginate(15);
+        $years = DB::table('teacher_subjects')->distinct()->pluck('academic_year');
 
-        $years = TeacherSubject::distinct('academic_year')->pluck('academic_year');
-        $departments = Teacher::distinct('department')->pluck('department');
+        $departments = DB::table('departments')
+            ->where('campus_id', $user->campus_id)
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.assignments.index', compact('assignments','search','year','semester','status','department','years','departments'));
+        return view('admin.assignments.index', compact(
+            'assignments','search','year','semester',
+            'status','department','years','departments'));
     }
 
     public function search(Request $request)
@@ -100,12 +110,12 @@ class AssignmentController extends AdminBaseController
         return response()->json(['assignments' => $assignments]);
     }
 
-    public function create(Request $request){
+    public function create(Request $request)
+    {
         $user = $request->user();
         $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
         $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
-        // $subjects = Subject::where('status', 'active')->orderBy('subject_name')->get();
-        $subjects= DB::table('subjects')->where('course_id',$user->course_id)->get();
+        $subjects = DB::table('subjects')->where('course_id', $user->course_id)->get();
 
         return view('admin.assignments.create', compact('teachers', 'subjects'));
     }

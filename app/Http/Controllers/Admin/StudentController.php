@@ -5,18 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends AdminBaseController
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $user = $request->user();
         $search = $request->get('search', '');
-        $query = User::where('role', 'student')->where('campus', $user->campus); 
+        $query = User::where('role', 'student');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -31,12 +33,12 @@ class StudentController extends AdminBaseController
         $search = $request->get('search', '');
 
         $query = User::where('role', 'student')
-                     ->where('campus', $user->campus); // campus lock
+            ->where('campus', $user->campus); // campus lock
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -45,30 +47,39 @@ class StudentController extends AdminBaseController
         return response()->json(['students' => $students]);
     }
 
-    public function create()
-    {
-        return view('admin.students.create');
+    public function create(){
+        $campuses = DB::table('campuses')->orderBy('campus_name')->get();
+        $departments = DB::table('departments')->orderBy('name')->get();
+        $courses = DB::table('courses')->orderBy('name')->get();
+        return view('admin.students.create', compact('campuses', 'departments', 'courses'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'first_name' => 'required|string',
-            'last_name'  => 'required|string',
-            'email'      => 'required|email|unique:users',
-            'password'   => 'required|string|min:8',
-            'campus'     => 'required|string',
-            'status'     => 'required|in:active,inactive',
+    public function store(Request $request){
+        $request->validate([
+            'first_name'    => 'required|string',
+            'last_name'     => 'required|string',
+            'email'         => 'required|email|unique:users',
+            'password'      => 'required|string|min:8',
+            'campus_id'     => 'required|exists:campuses,id',
+            'department_id' => 'nullable|exists:departments,id',
+            'course_id'     => 'nullable|exists:courses,id',
+            'year_level'    => 'required|in:1st,2nd,3rd,4th',
+            'status'        => 'required|in:active,inactive',
         ]);
 
         try {
-            User::create([
-                'name'     => $validated['first_name'] . ' ' . $validated['last_name'],
-                'email'    => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role'     => 'student',
-                'campus'   => $validated['campus'],
-                'status'   => $validated['status'],
+            DB::table('users')->insert([
+                'name'          => $request->first_name . ' ' . $request->last_name,
+                'email'         => $request->email,
+                'password'      => Hash::make($request->password),
+                'role'          => 'student',
+                'campus_id'     => $request->campus_id,
+                'department'    => $request->department_id,
+                'course_id'     => $request->course_id,
+                'year_level'    => $request->year_level,
+                'status'        => $request->status,
+                'created_at'    => now(),
+                'updated_at'    => now(),
             ]);
 
             return redirect()->route('admin.students.index')

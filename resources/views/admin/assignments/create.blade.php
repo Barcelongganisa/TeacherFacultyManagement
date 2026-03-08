@@ -34,7 +34,7 @@
                             <option value="">Choose a professor...</option>
                             @foreach($teachers as $teacher)
                             <option value="{{ $teacher->id }}">
-                                {{ $teacher->name }} ({{ $teacher->department ?? 'No Department' }})
+                                {{ $teacher->name }} 
                             </option>
                             @endforeach
                         </select>

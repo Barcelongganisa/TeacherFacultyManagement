@@ -38,9 +38,20 @@ use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservati
 use App\Http\Controllers\SuperAdmin\ProfileController as SuperAdminProfileController;
 use App\Http\Controllers\SuperAdmin\SuperAdminDepartmentController;
 use App\Http\Controllers\SuperAdmin\SuperAdminCourseController;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 Route::get('/', function () {
     return view('welcome');
+});
+Route::get('/debug-schedule', function () {
+    $user    = Auth::user();
+    $teacher = DB::table('teachers')->where('user_id', $user->id)->first();
+
+    return response()->json([
+        'user_id'          => $user->id,
+        'teacher_id'       => $teacher->id ?? null,
+        'schedule_teacher_ids' => DB::table('schedules')->pluck('teacher_id'), 
+    ]);
 });
 
 // Super Admin Routes

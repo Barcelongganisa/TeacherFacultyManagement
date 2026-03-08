@@ -22,15 +22,28 @@
                 <h5 class="mb-0">Student Information</h5>
             </div>
             <div class="card-body">
+
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        <strong>Please fix the following errors:</strong>
+                        <ul class="mb-0 mt-1">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <form action="{{ route('admin.students.store') }}" method="POST">
                     @csrf
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <label class="form-label">First Name <span class="text-danger">*</span></label>
                             <input type="text"
                                    class="form-control @error('first_name') is-invalid @enderror"
-                                   id="first_name"
                                    name="first_name"
                                    value="{{ old('first_name') }}"
                                    placeholder="Enter first name"
@@ -40,10 +53,9 @@
                             @enderror
                         </div>
                         <div class="col-md-6">
-                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
                             <input type="text"
                                    class="form-control @error('last_name') is-invalid @enderror"
-                                   id="last_name"
                                    name="last_name"
                                    value="{{ old('last_name') }}"
                                    placeholder="Enter last name"
@@ -54,11 +66,11 @@
                         </div>
                     </div>
 
+                    {{-- Email --}}
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
                         <input type="email"
                                class="form-control @error('email') is-invalid @enderror"
-                               id="email"
                                name="email"
                                value="{{ old('email') }}"
                                placeholder="Enter email address"
@@ -67,28 +79,88 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                     <div class="mb-3">
-                            <label for="campus" class="form-label">Campus <span class="text-danger">*</span></label>
-                            <select class="form-control @error('campus') is-invalid @enderror"
-                                    id="campus"
-                                    name="campus"
+
+                    {{-- Campus & Department --}}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Campus <span class="text-danger">*</span></label>
+                            <select id="campus_id" name="campus_id"
+                                    class="form-select @error('campus_id') is-invalid @enderror"
                                     required>
-                                <option value="">Select Campus</option>
-                                <option value="Main Campus" {{ old('campus') == 'Main Campus' ? 'selected' : '' }}>Main Campus</option>
-                                <option value="Congressional Extension Campus" {{ old('campus') == 'Congressional Extension Campus' ? 'selected' : '' }}>Congressional Extension Campus</option>
-                                <option value="Bagong Silang Extension Campus" {{ old('campus') == 'Bagong Silang Extension Campus' ? 'selected' : '' }}>Bagong Silang Extension Campus</option>
-                                <option value="Camarin Extension Campus" {{ old('campus') == 'Camarin Extension Campus' ? 'selected' : '' }}>Camarin Extension Campus</option>
+                                <option value="">-- Select Campus --</option>
+                                @foreach($campuses as $campus)
+                                    <option value="{{ $campus->id }}"
+                                        {{ old('campus_id') == $campus->id ? 'selected' : '' }}>
+                                        {{ $campus->campus_name }} ({{ $campus->campus_code }})
+                                    </option>
+                                @endforeach
                             </select>
-                            @error('campus')
+                            @error('campus_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            <select name="department_id" id="department_id"
+                                    class="form-select @error('department_id') is-invalid @enderror">
+                                <option value="">-- Select Campus First --</option>
+                                @foreach($departments as $department)
+                                    <option value="{{ $department->id }}"
+                                        data-campus="{{ $department->campus_id }}"
+                                        {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                        {{ $department->name }} ({{ $department->code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('department_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Course & Year Level --}}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Course</label>
+                            <select name="course_id" id="course_id"
+                                    class="form-select @error('course_id') is-invalid @enderror">
+                                <option value="">-- Select Department First --</option>
+                                @foreach($courses as $course)
+                                    <option value="{{ $course->id }}"
+                                        data-department="{{ $course->department_id }}"
+                                        {{ old('course_id') == $course->id ? 'selected' : '' }}>
+                                        {{ $course->name }} ({{ $course->code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('course_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Year Level <span class="text-danger">*</span></label>
+                            <select name="year_level"
+                                    class="form-select @error('year_level') is-invalid @enderror"
+                                    required>
+                                <option value="">-- Select Year Level --</option>
+                                <option value="1st" {{ old('year_level') == '1st' ? 'selected' : '' }}>1st Year</option>
+                                <option value="2nd" {{ old('year_level') == '2nd' ? 'selected' : '' }}>2nd Year</option>
+                                <option value="3rd" {{ old('year_level') == '3rd' ? 'selected' : '' }}>3rd Year</option>
+                                <option value="4th" {{ old('year_level') == '4th' ? 'selected' : '' }}>4th Year</option>
+                            </select>
+                            @error('year_level')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Password --}}
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
                         <input type="password"
                                class="form-control @error('password') is-invalid @enderror"
-                               id="password"
                                name="password"
                                placeholder="Minimum 8 characters"
                                required>
@@ -98,12 +170,12 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select class="form-select @error('status') is-invalid @enderror"
-                                id="status"
-                                name="status">
-                            <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                    {{-- Status --}}
+                    <div class="mb-4">
+                        <label class="form-label">Status</label>
+                        <select name="status"
+                                class="form-select @error('status') is-invalid @enderror">
+                            <option value="active"   {{ old('status', 'active') == 'active'   ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                         @error('status')
@@ -119,9 +191,73 @@
                             Cancel
                         </a>
                     </div>
+
                 </form>
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    const campusSelect     = document.getElementById('campus_id');
+    const departmentSelect = document.getElementById('department_id');
+    const courseSelect     = document.getElementById('course_id');
+
+    const allDeptOptions   = Array.from(departmentSelect.options);
+    const allCourseOptions = Array.from(courseSelect.options);
+
+    // Step 1 — Campus changes → filter departments
+    campusSelect.addEventListener('change', function () {
+        const selectedCampus = this.value;
+
+        departmentSelect.innerHTML = '';
+        courseSelect.innerHTML = '';
+        departmentSelect.add(new Option('-- Select Department --', ''));
+        courseSelect.add(new Option('-- Select Department First --', ''));
+
+        if (!selectedCampus) return;
+
+        allDeptOptions.forEach(option => {
+            if (option.dataset.campus === selectedCampus) {
+                departmentSelect.add(new Option(option.text, option.value));
+            }
+        });
+    });
+
+    // Step 2 — Department changes → filter courses
+    departmentSelect.addEventListener('change', function () {
+        const selectedDept = this.value;
+
+        courseSelect.innerHTML = '';
+        courseSelect.add(new Option('-- Select Course --', ''));
+
+        if (!selectedDept) return;
+
+        allCourseOptions.forEach(option => {
+            if (option.dataset.department === selectedDept) {
+                courseSelect.add(new Option(option.text, option.value));
+            }
+        });
+    });
+
+    const oldCampus = "{{ old('campus_id') }}";
+    const oldDept   = "{{ old('department_id') }}";
+    const oldCourse = "{{ old('course_id') }}";
+
+    if (oldCampus) {
+        campusSelect.value = oldCampus;
+        campusSelect.dispatchEvent(new Event('change'));
+
+        setTimeout(() => {
+            departmentSelect.value = oldDept;
+            departmentSelect.dispatchEvent(new Event('change'));
+
+            setTimeout(() => {
+                courseSelect.value = oldCourse;
+            }, 50);
+        }, 50);
+    }
+</script>
+@endpush
