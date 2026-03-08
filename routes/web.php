@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
 
     // Reservations (global view)
     Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');
+    Route::get('reservations/{reservation}', [SuperAdminReservationController::class, 'show'])->name('reservations.show'); 
     Route::post('reservations/{reservation}/approve', [SuperAdminReservationController::class, 'approve'])->name('reservations.approve');
     Route::post('reservations/{reservation}/reject', [SuperAdminReservationController::class, 'reject'])->name('reservations.reject');
 

@@ -199,10 +199,11 @@
                                     <strong>{{ $reservation->teacher->user->name ?? 'N/A' }}</strong>
                                     <small class="text-muted">{{ $reservation->teacher->user->email ?? '' }}</small>
                                     <small class="text-muted">
-                                        {{ $reservation->teacher->campus ?? '' }}
+                                        {{ $reservation->teacher->campus->campus_code ?? '' }}
+                                        @if($reservation->teacher?->campus?->campus_name)
+                                            - {{ $reservation->teacher->campus->campus_name }}
+                                        @endif
                                     </small>
-                                    @if($reservation->teacher && $reservation->teacher->campus) 
-                                    @endif
                                 </div>
                             </td>
                             <td>
@@ -339,7 +340,7 @@
                                 </tr>
                                 <tr>
                                     <th>Room Campus:</th>
-                                    <td>${reservation.classroom.campus ? reservation.classroom.campus.name : 'N/A'}</td>
+                                    <td>${reservation.classroom.campus ? reservation.classroom.campus.campus_code + ' - ' + reservation.classroom.campus.campus_name : 'N/A'}</td>
                                 </tr>
                             </table>
                         </div>
@@ -355,7 +356,7 @@
                                 </tr>
                                 <tr>
                                     <th>User Campus:</th>
-                                    <td>${reservation.user.campus ? reservation.user.campus.name : 'N/A'}</td>
+                                     <td>${reservation.classroom.campus ? reservation.classroom.campus.campus_code + ' - ' + reservation.classroom.campus.campus_name : 'N/A'}</td>
                                 </tr>
                                 <tr>
                                     <th>Status:</th>
@@ -424,39 +425,28 @@
     
     // Export function
     function exportReservations() {
-        // Prepare CSV headers
         const headers = ['Date', 'Time', 'Room', 'Room Campus', 'Purpose', 'Reserved By', 'Email', 'User Campus', 'Status', 'Rejection Reason'];
         let csvContent = headers.join(',') + '\n';
         
-        // Loop through table rows
         const rows = document.querySelectorAll('table tbody tr');
         rows.forEach(row => {
-            // Skip empty rows
             if (row.querySelectorAll('td').length === 1) return;
             
             const cols = row.querySelectorAll('td');
             
-            // Extract date and time
             const dateTimeElement = cols[0];
             const date = dateTimeElement.querySelector('strong')?.innerText || '';
             const time = dateTimeElement.querySelector('small')?.innerText || '';
             
-            // Room
             const room = cols[1].innerText.replace(/\n/g, ' ').trim();
-            
-            // Room Campus
             const roomCampus = cols[2].innerText.replace(/\n/g, ' ').trim();
-            
-            // Purpose
             const purpose = cols[3].innerText.replace(/\n/g, ' ').trim();
             
-            // User details
             const userDiv = cols[4];
             const userName = userDiv.querySelector('strong')?.innerText || '';
-            const userEmail = userDiv.querySelector('small')?.innerText || '';
-            const userCampus = userDiv.querySelector('small:last-child')?.innerText.replace('📍', '').trim() || '';
+            const userEmail = userDiv.querySelectorAll('small')[0]?.innerText || '';
+            const userCampus = userDiv.querySelectorAll('small')[1]?.innerText.trim() || '';
             
-            // Status
             const statusDiv = cols[5];
             const status = statusDiv.querySelector('.badge')?.innerText || '';
             const rejectionReason = statusDiv.querySelector('small')?.getAttribute('title') || '';
@@ -476,7 +466,6 @@
             csvContent += rowData.join(',') + '\n';
         });
 
-        // Create CSV and trigger download
         const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);

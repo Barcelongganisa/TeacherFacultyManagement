@@ -13,7 +13,7 @@ class ReservationController extends Controller
     {
         $query = Reservation::with([
             'classroom.campus',
-            'teacher',
+            'teacher.user',
             'timeSlot'
         ]);
 
@@ -130,57 +130,63 @@ class ReservationController extends Controller
 
     public function show(Reservation $reservation)
     {
-        $reservation->load([
-            'classroom.campus',
-            'teacher',
-            'timeSlot',
-            'approvedBy',
-            'rejectedBy',
-            'cancelledBy'
-        ]);
+        try {
+            $reservation->load([
+                'classroom.campus',
+                'teacher.user',
+                'timeSlot',
+            ]);
 
-        return response()->json([
-            'id' => $reservation->id,
-            'reservation_date' => $reservation->reservation_date->format('Y-m-d'),
-            'time_slot' => $reservation->timeSlot ? [
-                'start' => $reservation->timeSlot->start_time,
-                'end' => $reservation->timeSlot->end_time,
-                'full' => $reservation->timeSlot->start_time . ' - ' . $reservation->timeSlot->end_time
-            ] : null,
-            'purpose' => $reservation->purpose,
-            'notes' => $reservation->notes,
-            'status' => $reservation->status,
+            return response()->json([
+                'id' => $reservation->id,
+                'reservation_date' => $reservation->reservation_date->format('Y-m-d'),
+                'time_slot' => $reservation->timeSlot ? [
+                    'start' => $reservation->timeSlot->start_time,
+                    'end' => $reservation->timeSlot->end_time,
+                    'full' => $reservation->timeSlot->start_time . ' - ' . $reservation->timeSlot->end_time
+                ] : null,
+                'purpose' => $reservation->purpose,
+                'notes' => $reservation->notes,
+                'status' => $reservation->status,
 
-            'user' => [
-                'name' => $reservation->teacher->name ?? 'N/A',
-                'email' => $reservation->teacher->email ?? 'N/A',
-                'campus' => $reservation->teacher->campus ?? 'N/A'
-            ],
+                'user' => [
+                    'name'   => $reservation->teacher->name ?? 'N/A',
+                    'email'  => $reservation->teacher->email ?? 'N/A',
+                    'campus' => $reservation->teacher->campus ? [
+                        'campus_code' => $reservation->teacher->campus->campus_code,
+                        'campus_name' => $reservation->teacher->campus->campus_name,
+                    ] : null,
+                ],
 
-            'classroom' => [
-                'room_number' => $reservation->classroom->room_number,
-                'campus' => $reservation->classroom->campus ? [
-                    'id' => $reservation->classroom->campus->id,
-                    'name' => $reservation->classroom->campus->campus_name
-                ] : null
-            ],
+                'classroom' => [
+                    'room_number' => $reservation->classroom->room_number ?? 'N/A',
+                    'room_name'   => $reservation->classroom->room_name ?? null,
+                    'campus'      => $reservation->classroom->campus ? [
+                        'campus_code' => $reservation->classroom->campus->campus_code,
+                        'campus_name' => $reservation->classroom->campus->campus_name,
+                    ] : null
+                ],
 
-            'approved_by' => $reservation->approvedBy ? [
-                'name' => $reservation->approvedBy->name,
-                'email' => $reservation->approvedBy->email
-            ] : null,
+                'approved_by'      => null, // add relationship to Reservation model if needed
+                'approved_at'      => $reservation->approved_at,
+                'rejection_reason' => $reservation->rejection_reason,
+                'created_at'       => $reservation->created_at,
+            ]);
 
-            'approved_at' => $reservation->approved_at,
-            'rejection_reason' => $reservation->rejection_reason,
-            'created_at' => $reservation->created_at
-        ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'line'  => $e->getLine(),
+                'file'  => $e->getFile(),
+            ], 500);
+        }
     }
 
     public function export()
     {
         $reservations = Reservation::with([
             'classroom.campus',
-            'teacher',
+            'teacher.user',
             'timeSlot'
         ])->get();
 

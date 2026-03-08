@@ -99,8 +99,8 @@
                             </td>
                             <td>
                                 @if($user->campus)
-                                    <span class="badge bg-purple">{{ $user->campus }}</span>
-                                    <small class="d-block text-muted">{{ $user->campus }}</small>
+                                    <span class="badge bg-purple">{{ $user->campus->campus_code }}</span>
+                                    <small class="d-block text-muted">{{ $user->campus->campus_name }}</small>
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif
@@ -225,10 +225,6 @@
                 <tr>
                     <th>Email:</th>
                     <td>${user.email}</td>
-                </tr>
-                <tr>
-                    <th>Username:</th>
-                    <td>${user.username || 'N/A'}</td>
                 </tr>
                 <tr>
                     <th>Campus:</th>
