@@ -58,11 +58,8 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
     Route::resource('campuses', SuperAdminCampusController::class);
     Route::post('campuses/search', [SuperAdminCampusController::class, 'search'])->name('campuses.search');
 
-    // Department Management
-    Route::resource('departments', SuperAdminDepartmentController::class); // 👈 added
-
-    // Course Management
-    Route::resource('courses', SuperAdminCourseController::class); // 👈 added
+    Route::resource('departments', SuperAdminDepartmentController::class); 
+    Route::resource('courses', SuperAdminCourseController::class);
 
     // Reservations (global view)
     Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');
