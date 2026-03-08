@@ -73,7 +73,6 @@
     </div>
 </div>
 
-<!-- Students Table -->
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0">
@@ -85,7 +84,6 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Status</th>
@@ -95,8 +93,7 @@
                 </thead>
                 <tbody>
                     @forelse($students as $student)
-                        <tr>
-                            <td>#{{ $student->id }}</td>
+                        <tr>                 
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-circle bg-success text-white me-2">
