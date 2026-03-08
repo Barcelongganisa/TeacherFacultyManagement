@@ -40,17 +40,17 @@ use App\Http\Controllers\SuperAdmin\SuperAdminDepartmentController;
 use App\Http\Controllers\SuperAdmin\SuperAdminCourseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/debug-schedule', function () {
-    $user    = Auth::user();
-    $teacher = DB::table('teachers')->where('user_id', $user->id)->first();
+Route::get('/debug-student-schedule', function () {
+    $user = Auth::user();
 
     return response()->json([
-        'user_id'          => $user->id,
-        'teacher_id'       => $teacher->id ?? null,
-        'schedule_teacher_ids' => DB::table('schedules')->pluck('teacher_id'), 
+        'schedules_teacher_ids' => DB::table('schedules')->pluck('teacher_id'),  // what's in schedules
+        'teachers_ids'          => DB::table('teachers')->pluck('id'),            // what's in teachers
+        'users_ids'             => DB::table('users')->pluck('id'),               // what's in users
     ]);
 });
 
@@ -69,7 +69,7 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
     Route::resource('campuses', SuperAdminCampusController::class);
     Route::post('campuses/search', [SuperAdminCampusController::class, 'search'])->name('campuses.search');
 
-    Route::resource('departments', SuperAdminDepartmentController::class); 
+    Route::resource('departments', SuperAdminDepartmentController::class);
     Route::resource('courses', SuperAdminCourseController::class);
 
     // Reservations (global view)
@@ -138,26 +138,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
-    // Dashboard
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
-
-    // Announcements
     Route::get('/announcements', [StudentAnnouncementController::class, 'index'])->name('announcements');
     Route::post('/announcements/mark-read', [StudentAnnouncementController::class, 'markRead'])->name('announcements.mark-read');
-
-    // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
-
-    // Schedule
-    Route::get('/schedule', [StudentScheduleController::class, 'index'])->name('schedule');
-
-    // Subjects
+    Route::get('/schedule', [StudentScheduleController::class, 'schedule'])->name('schedule');
     Route::get('/subjects', [StudentSubjectController::class, 'index'])->name('subjects');
     Route::post('/subjects/enroll', [StudentSubjectController::class, 'enroll'])->name('subjects.enroll');
     Route::post('/subjects/unenroll', [StudentSubjectController::class, 'unenroll'])->name('subjects.unenroll');
-
-    // Teachers
     Route::get('/teachers', [StudentTeacherController::class, 'index'])->name('teachers');
     Route::post('/teachers/search', [StudentTeacherController::class, 'search'])->name('teachers.search');
     Route::get('/teacher-profile/{id}', [StudentTeacherController::class, 'show'])->name('teacher-profile');
