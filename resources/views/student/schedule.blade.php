@@ -36,7 +36,6 @@
                             <thead style="background: var(--soft-green);">
                                 <tr>
                                     <th class="py-3 ps-4"><i class="fas fa-calendar-day me-2"></i>Day</th>
-                                    <th class="py-3"><i class="fas fa-clock me-2"></i>Time Slot</th>
                                     <th class="py-3"><i class="fas fa-book me-2"></i>Subject</th>
                                     <th class="py-3"><i class="fas fa-user-tie me-2"></i>Professor</th>
                                     <th class="py-3"><i class="fas fa-map-marker-alt me-2"></i>Room</th>
@@ -49,13 +48,7 @@
                                     <td class="ps-4">
                                         <span class="badge" style="background: var(--primary-green); color: white; padding: 0.5rem 1rem; border-radius: 50px; min-width: 100px;">
                                             <i class="far fa-calendar-alt me-1"></i>
-                                            {{ $schedule->day }}  {{-- 👈 fixed: was day_of_week --}}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge" style="background: var(--soft-green); color: var(--primary-green-dark); padding: 0.5rem 1rem; border-radius: 50px;">
-                                            <i class="far fa-clock me-1"></i>
-                                            {{ $schedule->start_time }} - {{ $schedule->end_time }}
+                                            {{ $schedule->day }} 
                                         </span>
                                     </td>
                                     <td>

@@ -139,8 +139,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/announcements', [StudentAnnouncementController::class, 'index'])->name('announcements');
-    Route::post('/announcements/mark-read', [StudentAnnouncementController::class, 'markRead'])->name('announcements.mark-read');
+    // Route::get('/announcements', [StudentAnnouncementController::class, 'index'])->name('announcements');
+    // Route::post('/announcements/mark-read', [StudentAnnouncementController::class, 'markRead'])->name('announcements.mark-read');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::get('/schedule', [StudentScheduleController::class, 'schedule'])->name('schedule');
