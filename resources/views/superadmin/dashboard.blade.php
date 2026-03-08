@@ -2,11 +2,11 @@
 
 @section('title', 'Dashboard - Super Admin')
 
-{{-- <style>
-    html{
-        overflow-y: hidden;
+<style>
+    #mainContent > div > div:nth-child(1) > div.col-12 > div > div.card-body.p-0{
+        margin-top: 10px !important; 
     }
-</style> --}}
+</style>
 
 @section('page-header')
     <div class="flex-between">

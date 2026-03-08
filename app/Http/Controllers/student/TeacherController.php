@@ -68,26 +68,26 @@ public function show($id)
         ->get();
 
     // Fetch today's schedule (optional, adjust table/columns as needed)
-$todaySchedule = DB::table('schedules')
-    ->join('subjects', 'schedules.subject_id', '=', 'subjects.id')
-    ->join('rooms', 'schedules.classroom_id', '=', 'rooms.id') // classroom_id, not room_id
-    ->select(
-        'schedules.id',
-        'schedules.date',
-        'schedules.created_at',
-        'schedules.updated_at',
-        'subjects.subject_name',
-        'subjects.subject_code',
-        'rooms.room_name',
-        'rooms.room_number'
-    )
-    ->where('schedules.teacher_id', $id)
-    ->whereDate('schedules.date', now())
-    ->get();
+    $todaySchedule = DB::table('schedules')
+        ->join('subjects', 'schedules.subject_id', '=', 'subjects.id')
+        ->join('rooms', 'schedules.classroom_id', '=', 'rooms.id') // classroom_id, not room_id
+        ->select(
+            'schedules.id',
+            'schedules.date',
+            'schedules.created_at',
+            'schedules.updated_at',
+            'subjects.subject_name',
+            'subjects.subject_code',
+            'rooms.room_name',
+            'rooms.room_number'
+        )
+        ->where('schedules.teacher_id', $id)
+        ->whereDate('schedules.date', now())
+        ->get();
 
-    // Current location (if you have a tracking system; else just default)
-    $currentLocation = '-'; // or fetch dynamically if you track attendance/location
+        // Current location (if you have a tracking system; else just default)
+        $currentLocation = '-'; // or fetch dynamically if you track attendance/location
 
-    return view('student.teacher-profile', compact('teacher', 'subjects', 'todaySchedule', 'currentLocation'));
-}
+        return view('student.teacher-profile', compact('teacher', 'subjects', 'todaySchedule', 'currentLocation'));
+    }
 }

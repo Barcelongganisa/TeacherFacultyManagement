@@ -524,9 +524,9 @@ $displayName = $user->name ?? $user->username ?? 'Administrator';
 </div>
 
 <!-- Sidebar Toggle Button -->
-<button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar">
+{{-- <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar">
     <i class="fas fa-chevron-left" id="toggleIcon"></i>
-</button>
+</button> --}}
 
 <!-- Help Modal -->
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
@@ -582,42 +582,42 @@ $displayName = $user->name ?? $user->username ?? 'Administrator';
         </div>
     </div>
 </div>
-
 <script>
-$(document).ready(function() {
-    // Sidebar toggle functionality
-    const sidebar = $('#adminSidebar');
-    const toggleBtn = $('#sidebarToggleBtn');
-    const toggleIcon = $('#toggleIcon');
-    
-    // Check localStorage for sidebar state
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar   = document.getElementById('adminSidebar');
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    // Restore saved state
     if (localStorage.getItem('adminSidebarCollapsed') === 'true') {
-        sidebar.addClass('collapsed');
-        toggleIcon.removeClass('fa-chevron-left').addClass('fa-chevron-right');
+        sidebar.classList.add('collapsed');
+        toggleIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
     }
-    
-    toggleBtn.click(function() {
-        sidebar.toggleClass('collapsed');
-        
-        if (sidebar.hasClass('collapsed')) {
-            toggleIcon.removeClass('fa-chevron-left').addClass('fa-chevron-right');
-            localStorage.setItem('adminSidebarCollapsed', 'true');
-        } else {
-            toggleIcon.removeClass('fa-chevron-right').addClass('fa-chevron-left');
-            localStorage.setItem('adminSidebarCollapsed', 'false');
-        }
-    });
-    
-    // Mobile sidebar toggle
-    $('#sidebarToggle').click(function() {
-        sidebar.toggleClass('active');
-    });
-    
+
+    // Desktop toggle
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            toggleIcon.classList.toggle('fa-chevron-left', !isCollapsed);
+            toggleIcon.classList.toggle('fa-chevron-right', isCollapsed);
+            localStorage.setItem('adminSidebarCollapsed', isCollapsed);
+        });
+    }
+
+    // Mobile toggle
+    const mobileToggle = document.getElementById('sidebarToggle');
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', function () {
+            sidebar.classList.toggle('active');
+        });
+    }
+
     // Close sidebar when clicking outside on mobile
-    $(document).click(function(event) {
-        if ($(window).width() <= 768) {
-            if (!$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
-                sidebar.removeClass('active');
+    document.addEventListener('click', function (e) {
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !e.target.closest('#sidebarToggle')) {
+                sidebar.classList.remove('active');
             }
         }
     });

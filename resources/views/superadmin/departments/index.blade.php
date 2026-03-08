@@ -100,14 +100,6 @@
                                        class="btn btn-outline-info" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <form action="{{ route('superadmin.departments.destroy', $department->id) }}"
-                                          method="POST" class="d-inline"
-                                          onsubmit="return confirm('Delete {{ $department->name }}? This may affect related courses.')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-outline-danger" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>

@@ -97,6 +97,24 @@
         transform:translateY(-50%);
         cursor:pointer;
         color:#777;
+        z-index: 10;  /* FIX: ensure icon sits above the input */
+    }
+
+    .toggle-password:hover {
+        color: #2e7d32;
+    }
+
+    /* Forgot password link */
+    .forgot-password-link {
+        color: #2e7d32;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .forgot-password-link:hover {
+        color: #256b2a;
+        text-decoration: underline;
     }
 </style>
 
@@ -131,20 +149,48 @@
                     </div>
 
                     <!-- Password -->
-                    <div class="mb-3 password-group">
+                    <div class="mb-1 password-group">
                         <label class="form-label">Password</label>
 
                         <div class="password-wrapper">
                             <input 
                                 type="password"
-                                class="form-control modern-input"
+                                class="form-control modern-input pe-5"
                                 name="password"
-                                id="password"
+                                id="loginPassword"
                                 placeholder="Enter your password"
                                 required>
 
-                            <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                            <i class="fas fa-eye toggle-password"
+                               onclick="
+                                   var inp = document.getElementById('loginPassword');
+                                   if (inp.type === 'password') {
+                                       inp.type = 'text';
+                                       this.classList.remove('fa-eye');
+                                       this.classList.add('fa-eye-slash');
+                                   } else {
+                                       inp.type = 'password';
+                                       this.classList.remove('fa-eye-slash');
+                                       this.classList.add('fa-eye');
+                                   }
+                               ">
+                            </i>
                         </div>
+                    </div>
+
+                    <!-- Forgot Password -->
+                    <div class="text-end mb-3">
+                        <a href="#" class="forgot-password-link"
+                           onclick="
+                               bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+                               setTimeout(function(){
+                                   var fp = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+                                   fp.show();
+                               }, 300);
+                               return false;
+                           ">
+                            Forgot password?
+                        </a>
                     </div>
 
                     <!-- Remember -->
@@ -166,38 +212,88 @@
     </div>
 </div>
 
+{{-- ───────────────────────────────────────────────────────────────────── --}}
+{{-- Forgot Password Modal                                                  --}}
+{{-- ───────────────────────────────────────────────────────────────────── --}}
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modern-login-modal">
+
+            <!-- Header -->
+            <div class="modern-login-header">
+                <i class="fas fa-key login-icon"></i>
+                <h5>Reset Password</h5>
+                <p>We'll email you a reset link</p>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body modern-login-body">
+
+                <div id="forgotAlert" class="alert d-none"></div>
+
+                <form id="forgotForm" method="POST" action="{{ route('password.email') }}">
+                    @csrf
+                    <div class="mb-4">
+                        <label class="form-label">Email Address</label>
+                        <input
+                            type="email"
+                            class="form-control modern-input"
+                            name="email"
+                            placeholder="Enter your email"
+                            required>
+                    </div>
+
+                    <button type="submit" class="btn modern-login-btn w-100" id="forgotButton">
+                        <span class="spinner-border spinner-border-sm d-none"></span>
+                        <span class="btn-text">Send Reset Link</span>
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a href="#" class="forgot-password-link"
+                           onclick="
+                               bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
+                               setTimeout(function(){
+                                   var lm = new bootstrap.Modal(document.getElementById('loginModal'));
+                                   lm.show();
+                               }, 300);
+                               return false;
+                           ">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
-// Make sure these functions are globally available
 window.openLoginModal = function() {
     var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
     loginModal.show();
 }
 
-// Handle login form submission
 document.addEventListener('DOMContentLoaded', function() {
+
+    // ── Login form AJAX ──────────────────────────────────────────────────
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const formData = new FormData(this);
+            const formData    = new FormData(this);
             const loginButton = document.getElementById('loginButton');
-            const spinner = loginButton.querySelector('.spinner-border');
-            const buttonText = loginButton.querySelector('.btn-text');
-            const alertDiv = document.getElementById('loginAlert');
+            const spinner     = loginButton.querySelector('.spinner-border');
+            const buttonText  = loginButton.querySelector('.btn-text');
+            const alertDiv    = document.getElementById('loginAlert');
             
-            // Show loading state
             loginButton.disabled = true;
             spinner.classList.remove('d-none');
             buttonText.textContent = ' Logging in...';
             alertDiv.classList.add('d-none');
             
-            // Get the correct action URL
-            const actionUrl = this.getAttribute('action');
-            
-            // Send AJAX request
-            fetch(actionUrl, {
+            fetch(this.getAttribute('action'), {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -209,10 +305,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.redirect) {
-                    // Successful login - redirect to dashboard
                     window.location.href = data.redirect;
                 } else if (data.errors) {
-                    // Validation errors
                     let errorHtml = '<ul class="mb-0">';
                     for (let field in data.errors) {
                         data.errors[field].forEach(error => {
@@ -220,12 +314,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     errorHtml += '</ul>';
-                    
                     alertDiv.className = 'alert alert-danger';
                     alertDiv.innerHTML = errorHtml;
                     alertDiv.classList.remove('d-none');
                 } else if (data.error) {
-                    // General error
                     alertDiv.className = 'alert alert-danger';
                     alertDiv.textContent = data.error;
                     alertDiv.classList.remove('d-none');
@@ -238,10 +330,66 @@ document.addEventListener('DOMContentLoaded', function() {
                 alertDiv.classList.remove('d-none');
             })
             .finally(() => {
-                // Reset button state
                 loginButton.disabled = false;
                 spinner.classList.add('d-none');
                 buttonText.textContent = 'Sign In';
+            });
+        });
+    }
+
+    // ── Forgot password form AJAX ────────────────────────────────────────
+    const forgotForm = document.getElementById('forgotForm');
+    if (forgotForm) {
+        forgotForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData     = new FormData(this);
+            const forgotButton = document.getElementById('forgotButton');
+            const spinner2     = forgotButton.querySelector('.spinner-border');
+            const buttonText2  = forgotButton.querySelector('.btn-text');
+            const alertDiv2    = document.getElementById('forgotAlert');
+
+            forgotButton.disabled = true;
+            spinner2.classList.remove('d-none');
+            buttonText2.textContent = ' Sending...';
+            alertDiv2.classList.add('d-none');
+
+            fetch(this.getAttribute('action'), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    alertDiv2.className = 'alert alert-success';
+                    alertDiv2.textContent = data.status;
+                    alertDiv2.classList.remove('d-none');
+                    forgotForm.reset();
+                } else if (data.errors) {
+                    let errorHtml = '<ul class="mb-0">';
+                    for (let field in data.errors) {
+                        data.errors[field].forEach(err => { errorHtml += `<li>${err}</li>`; });
+                    }
+                    errorHtml += '</ul>';
+                    alertDiv2.className = 'alert alert-danger';
+                    alertDiv2.innerHTML = errorHtml;
+                    alertDiv2.classList.remove('d-none');
+                }
+            })
+            .catch(() => {
+                alertDiv2.className = 'alert alert-danger';
+                alertDiv2.textContent = 'An error occurred. Please try again.';
+                alertDiv2.classList.remove('d-none');
+            })
+            .finally(() => {
+                forgotButton.disabled = false;
+                spinner2.classList.add('d-none');
+                buttonText2.textContent = 'Send Reset Link';
             });
         });
     }

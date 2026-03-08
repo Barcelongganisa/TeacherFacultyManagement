@@ -463,7 +463,7 @@ $displayName = $teacher->name ?? $user->name ?? 'Teacher';
                 <div class="text-center">
                     <p class="mb-2"><strong>Need assistance?</strong></p>
                     <p class="mb-2">
-                        <i class="fas fa-envelope me-2"></i> support@crs.edu<br>
+                        <i class="fas fa-envelope me-2"></i> support@cms.edu<br>
                         <i class="fas fa-phone me-2"></i> (123) 456-7890
                     </p>
                     <p class="text-muted small">Available Monday-Friday, 8:00 AM - 5:00 PM</p>

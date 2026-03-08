@@ -32,7 +32,7 @@ class User extends Authenticatable
         'department',
         'address',
         'bio',
-        'campus'
+        'campus_id'
     ];
 
     /**

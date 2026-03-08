@@ -52,4 +52,58 @@ class SuperAdminDepartmentController extends Controller
         return redirect()->route('superadmin.departments.index')->with('success', 'Department created successfully.');
     }
 
+    public function edit($id){
+        $department = Department::findOrFail($id);
+        $campuses = Campus::orderBy('campus_name')->get();
+        return view('superadmin.departments.edit', compact('department', 'campuses'));
+    }
+
+    public function show($id)
+    {
+        $department = DB::table('departments')
+            ->join('campuses', 'departments.campus_id', '=', 'campuses.id')
+            ->select('departments.*', 'campuses.campus_name')
+            ->where('departments.id', $id)
+            ->firstOrFail();
+
+        $courses = DB::table('courses')
+            ->where('department_id', $id)
+            ->get();
+
+        return view('superadmin.departments.show', compact('department', 'courses'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'code'      => 'required|string|max:10|unique:departments,code,' . $id,
+            'campus_id' => 'required|exists:campuses,id',
+        ]);
+
+        DB::table('departments')->where('id', $id)->update([
+            'name'       => $request->name,
+            'code'       => strtoupper($request->code),
+            'campus_id'  => $request->campus_id,
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('superadmin.departments.show', $id)
+            ->with('success', 'Department updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $courseCount = DB::table('courses')->where('department_id', $id)->count();
+
+        if ($courseCount > 0) {
+            return back()->with('error', 'Cannot delete a department that has existing courses.');
+        }
+
+        DB::table('departments')->where('id', $id)->delete();
+
+        return redirect()->route('superadmin.departments.index')
+            ->with('success', 'Department deleted successfully.');
+    }
+
 }

@@ -37,7 +37,7 @@ $recentAnnouncements = $recentAnnouncements ?? collect([]);
                     <i class="fas fa-calendar-day me-2" style="font-size: 1.5rem; color: var(--primary-green);"></i>
                     <h3 class="mb-0">Today's Schedule</h3>
                 </div>
-                <a href="{{ route('student.schedule') }}" class="btn btn-sm" style="background: var(--primary-green); color: white; border-radius: 50px; padding: 0.5rem 1.5rem;">
+                <a href="{{ route('student.schedule') }}" class="btn btn-sm" style="background: var(--primary-green); color: white; border-radius: 50px; padding: 0.5rem 1.5rem; margin-top: 10px">
                     <i class="fas fa-calendar-alt me-1"></i> View Full Schedule
                 </a>
             </div>

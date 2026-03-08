@@ -138,7 +138,7 @@
 <body>
     <div class="hero-container">
         <div class="hero-icon"><i class="fas fa-graduation-cap"></i></div>
-        <h1>CRS</h1>
+        <h1>CMS</h1>
         <p class="subtitle">Classroom Monitoring System</p>
         <p style="color: #555; margin-bottom: 25px;">
             A comprehensive solution for managing teachers, subjects, classrooms, and teaching schedules in educational institutions.
@@ -176,8 +176,11 @@
         </div>
     </div>
 
-    <!-- Login Modal -->
+    {{-- Login Modal --}}
     <x-login-modal />
+
+    {{-- Forgot Password Modal --}}
+    <x-forgot-password-modal />
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
