@@ -8,7 +8,7 @@ class Classroom extends Model
 {
     protected $fillable = [
         'room_number', 'room_name', 'building',
-        'capacity', 'room_type', 'equipment', 'floor', 'status'
+        'capacity', 'room_type', 'equipment', 'floor', 'status', 'campus_id'
     ];
 
     public function schedules()
@@ -23,6 +23,6 @@ class Classroom extends Model
 
         public function campus()
     {
-        return $this->belongsTo(Campus::class);
+        return $this->belongsTo(Campus::class, 'campus_id');
     }
 }
