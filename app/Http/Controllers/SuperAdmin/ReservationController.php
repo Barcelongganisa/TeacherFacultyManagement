@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class ReservationController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request,Reservation $reservation)
     {
         $query = Reservation::with([
             'classroom.campus',
@@ -54,9 +54,7 @@ class ReservationController extends Controller
         $pendingCount = Reservation::where('status', 'pending')->count();
         $approvedCount = Reservation::where('status', 'approved')->count();
         $todayCount = Reservation::whereDate('reservation_date', today())->count();
-
-        $campuses = Campus::where('status', 'active')->get();
-
+        $campuses = Campus::all();
         return view('superadmin.reservations.index', compact(
             'reservations',
             'totalReservations',

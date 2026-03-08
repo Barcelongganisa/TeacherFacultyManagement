@@ -180,10 +180,15 @@
                                     <br><small class="text-muted">{{ $reservation->classroom->room_name }}</small>
                                 @endif
                             </td>
-                            <td>
-                                <span class="badge bg-purple">{{ $reservation->classroom->campus->campus_code ?? 'N/A' }}</span>
-                                <br><small class="text-muted">{{ $reservation->classroom->campus->campus_name ?? '' }}</small>
-                            </td>
+                        <td>
+    <span class="badge bg-purple">
+        {{ $reservation->classroom?->campus?->campus_code ?? 'N/A' }}
+    </span>
+    <br>
+    <small class="text-muted">
+        {{ $reservation->classroom?->campus?->campus_name ?? '' }}
+    </small>
+</td>
                             <td>
                                 <div data-bs-toggle="tooltip" title="{{ $reservation->purpose }}">
                                     {{ Str::limit($reservation->purpose, 30) }}
