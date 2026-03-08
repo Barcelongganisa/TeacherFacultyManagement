@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Classroom;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 class ClassroomController extends AdminBaseController
 {
     public function index(Request $request)
@@ -82,9 +82,9 @@ class ClassroomController extends AdminBaseController
         return view('admin.classrooms.create');
     }
     
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
+    public function store(Request $request){
+        $user = $request->user();
+        $request->validate([
             'room_number' => 'required|string',
             'room_name' => 'required|string',
             'building' => 'nullable|string',
@@ -94,19 +94,32 @@ class ClassroomController extends AdminBaseController
             'floor' => 'nullable|string',
         ]);
         
-        // Check for duplicate
-        $exists = Classroom::where('room_number', $validated['room_number'])
+        $exists = Classroom::where('room_number', $request['room_number'])
             ->where('building', $validated['building'] ?? '')
             ->exists();
             
         if ($exists) {
-            $buildingText = !empty($validated['building']) ? "in building '{$validated['building']}'" : "with no building specified";
-            return back()->with('error', "A classroom with room number '{$validated['room_number']}' already exists {$buildingText}.")->withInput();
+            $buildingText = !empty($validated['building']) ? "in building '{$request['building']}'" : "with no building specified";
+            return back()->with('error', "A classroom with room number '{$request['room_number']}' already exists {$buildingText}.")->withInput();
         }
         
         try {
-            Classroom::create($validated + ['status' => 'active']);
-            
+            // Classroom::create($validated + ['status' => 'active']);
+            DB::table('classrooms')->insert([
+                'room_number' =>$request->room_number,
+                'room_name' =>$request->room_name,
+                'capacity' =>$request->capacity,
+                'room_type' =>$request->room_type,
+                'name' =>$request->room_name,
+                'room' =>$request->room_number,
+                'status' =>'active',
+                'created_at' =>now(),
+                'updated_at' =>now(),
+                'building' =>$request->building,
+                'campus_id' =>$user->campus_id,
+                'equipment' =>$request->equipment,
+                'floor' =>$request->floor,
+            ]);
             return redirect()->route('admin.classrooms.index')
                 ->with('success', 'Classroom added successfully!');
         } catch (\Exception $e) {
