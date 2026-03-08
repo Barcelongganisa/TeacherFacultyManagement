@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Course;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,8 +11,8 @@ class SubjectController extends AdminBaseController
 {
     public function index(Request $request)
     {
+        $userCourse = $request->user();
         $search = $request->get('search', '');
-        $department = $request->get('department', '');
         $status = $request->get('status', '');
 
         $query = Subject::query();
@@ -24,19 +25,14 @@ class SubjectController extends AdminBaseController
             });
         }
 
-        if ($department) {
-            $query->where('department', $department);
-        }
 
         if ($status) {
             $query->where('status', $status);
         }
 
-        $subjects = $query->orderBy('subject_code')->paginate(15);
+        $subjects = $query->orderBy('subject_code')->where('course_id', $userCourse->course_id)->paginate(15);
 
-        $departments = Subject::distinct('department')->pluck('department');
-
-        return view('admin.subjects.index', compact('subjects', 'search', 'department', 'status', 'departments'));
+        return view('admin.subjects.index', compact('subjects', 'search',  'status'));
     }
 
     public function search(Request $request)
@@ -70,34 +66,38 @@ class SubjectController extends AdminBaseController
 
     public function create()
     {
-        return view('admin.subjects.create');
+        $courses = Course::orderBy('name')->get();
+        return view('admin.subjects.create', compact('courses'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'subject_code' => 'required|string|unique:subjects',
-            'subject_name' => 'required|string',
-            'department' => 'nullable|string',
-            'description' => 'nullable|string',
-            'campus' => 'nullable|string',
-            'credits' => 'nullable|integer|min:1|max:10',
+            'subject_code' => 'required|string|max:20|unique:subjects,subject_code',
+            'subject_name' => 'required|string|max:255',
+            'credits'      => 'nullable|integer|min:1|max:10',
+            'course_id'    => 'required|exists:courses,id',
+            'year_level'   => 'required|in:1st,2nd,3rd,4th',
+            'semester'     => 'required|in:1st Semester,2nd Semester,Summer',
+            'description'  => 'nullable|string',
+            'status'       => 'required|in:active,inactive',
         ]);
 
-        try {
-            DB::table('subjects')->insert([
-                'subject_code' => $request->subject_code,
-                'subject_name' => $request->subject_name,
-                'description' => $request->description,
-                'credits' => $request->credits,
-                'status' => 'active',
-                'code' => $request->subject_code,
-                'department' => $request->department,
-            ]);
-            return redirect()->route('admin.subjects.index')->with('success', 'Subject added successfully!');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Error adding subject: ' . $e->getMessage());
-        }
+        DB::table('subjects')->insert([
+            'subject_code' => strtoupper($request->subject_code),
+            'subject_name' => $request->subject_name,
+            'credits'      => $request->credits,
+            'course_id'    => $request->course_id,
+            'year_level'   => $request->year_level,
+            'semester'     => $request->semester,
+            'description'  => $request->description,
+            'status'       => $request->status,
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
+
+        return redirect()->route('admin.subjects.index')
+            ->with('success', 'Subject added successfully.');
     }
 
     public function edit($id)

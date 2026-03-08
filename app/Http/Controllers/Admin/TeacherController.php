@@ -13,13 +13,12 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherController extends AdminBaseController
 {
-    public function index(Request $request)
-    {
+    public function index(Request $request){
+        $userCourse = $request->user();
         $search = $request->get('search', '');
         $status = $request->get('status', '');
 
         $query = Teacher::with('user');
-
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -33,7 +32,7 @@ class TeacherController extends AdminBaseController
             $query->where('status', $status);
         }
 
-        $teachers = $query->orderBy('created_at', 'desc')->paginate(15);
+        $teachers = $query->orderBy('created_at', 'desc')->where('course_id',$userCourse->course_id)->paginate(15);
 
         return view('admin.teachers.index', compact('teachers', 'search', 'status'));
     }

@@ -8,7 +8,7 @@ class Subject extends Model
 {
     protected $fillable = [
         'subject_code', 'subject_name', 'department',
-        'description', 'credits', 'status'
+        'description', 'credits', 'status','course_id'
     ];
 
     public function schedules()

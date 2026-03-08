@@ -38,19 +38,6 @@
                         <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <label for="department" class="form-label">Department</label>
-                    <select class="form-select" id="department" name="department">
-                        <option value="">All Departments</option>
-                        @foreach($departments as $dept)
-                            @if($dept)
-                                <option value="{{ $dept }}" {{ request('department') == $dept ? 'selected' : '' }}>
-                                    {{ $dept }}
-                                </option>
-                            @endif
-                        @endforeach
-                    </select>
-                </div>
                 <div class="col-md-2">
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" id="status" name="status">
@@ -102,7 +89,7 @@
                     <tr>
                         <th>Code</th>
                         <th>Name</th>
-                        <th>Department</th>
+                        <th>Year Level</th>
                         <th>Credits</th>
                         <th>Status</th>
                         <th class="text-end">Actions</th>
@@ -113,7 +100,7 @@
                         <tr>
                             <td><strong>{{ $subject->subject_code }}</strong></td>
                             <td>{{ $subject->subject_name }}</td>
-                            <td>{{ $subject->department ?? '-' }}</td>
+                            <td>{{ $subject->year_level ?? '-' }}</td>
                             <td>{{ $subject->credits }}</td>
                             <td>
                                 <span class="badge bg-{{ $subject->status === 'active' ? 'success' : 'danger' }}">

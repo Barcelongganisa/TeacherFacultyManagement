@@ -344,11 +344,24 @@ $unassignedAdminsCount = DB::table('users')
 
         <!-- Campus Management Section -->
         <div class="nav-section-title">CAMPUS MANAGEMENT</div>
-        
+       
         <li class="nav-item">
             <a href="{{ route('superadmin.campuses.index') }}" class="nav-link {{ request()->routeIs('superadmin.campuses.*') ? 'active' : '' }}">
                 <i class="fas fa-university"></i>
                 <span>Campuses</span>
+            </a>
+        </li>
+         <li class="nav-item">
+            <a href="{{ route('superadmin.departments.index') }}" class="nav-link {{ request()->routeIs('superadmin.departments.*') ? 'active' : '' }}">
+                <i class="fas fa-building"></i>
+                <span>Departments</span>
+            </a>
+        </li>
+       <li class="nav-item">
+            <a href="{{ route('superadmin.courses.index') }}" 
+            class="nav-link {{ request()->routeIs('superadmin.courses.*') ? 'active' : '' }}">
+                <i class="fas fa-book-open"></i>
+                <span>Courses</span>
             </a>
         </li>
         

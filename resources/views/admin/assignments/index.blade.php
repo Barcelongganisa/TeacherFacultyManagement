@@ -107,6 +107,7 @@
             <i class="fas fa-list me-2 text-success"></i>Assignments List
         </h5>
     </div>
+
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -120,75 +121,101 @@
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    @forelse($assignments as $assignment)
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-circle bg-success text-white me-2">
-                                        {{ substr($assignment->teacher->first_name ?? '', 0, 1) }}{{ substr($assignment->teacher->last_name ?? '', 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <strong>{{ $assignment->teacher->first_name ?? '' }} {{ $assignment->teacher->last_name ?? '' }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ $assignment->teacher->department ?? '' }}</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <strong>{{ $assignment->subject->subject_name ?? '' }}</strong>
+                @forelse($assignments as $assignment)
+                <tr>
+
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle bg-success text-white me-2">
+                                {{ substr($assignment->name ?? '',0,1) }}
+                            </div>
+
+                            <div>
+                                <strong>
+                                    {{ $assignment->name ?? '' }}
+                                </strong>
                                 <br>
-                                <small class="text-muted">{{ $assignment->subject->subject_code ?? '' }}</small>
-                            </td>
-                            <td>{{ $assignment->academic_year }}</td>
-                            <td>{{ $assignment->semester }}</td>
-                            <td>
-                                <span class="badge bg-{{ $assignment->status === 'active' ? 'success' : 'danger' }}">
-                                    {{ ucfirst($assignment->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" 
-                                            class="btn btn-sm btn-danger" 
-                                            onclick="confirmDelete({{ $assignment->id }})"
-                                            data-bs-toggle="tooltip" 
-                                            title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                                
-                                <form id="delete-form-{{ $assignment->id }}" 
-                                      action="{{ route('admin.assignments.destroy', $assignment->id) }}" 
-                                      method="POST" 
-                                      class="d-none">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
-                                <p class="text-muted mb-0">No assignments found</p>
-                                <a href="{{ route('admin.assignments.create') }}" class="btn btn-success btn-sm mt-3">
-                                    <i class="fas fa-plus me-2"></i>Create Your First Assignment
-                                </a>
-                            </td>
-                        </tr>
-                    @endforelse
+                                <small class="text-muted">
+                                    {{ $assignment->department ?? '' }}
+                                </small>
+                            </div>
+                        </div>
+                    </td>
+
+                    {{-- SUBJECT --}}
+                    <td>
+                        <strong>{{ $assignment->subject_name ?? '' }}</strong>
+                        <br>
+                        <small class="text-muted">
+                            {{ $assignment->subject_code ?? '' }}
+                        </small>
+                    </td>
+
+                    <td>{{ $assignment->academic_year }}</td>
+                    <td>{{ $assignment->semester }}</td>
+
+                    {{-- STATUS --}}
+                    <td>
+                        <span class="badge bg-{{ $assignment->status == 'active' ? 'success' : 'danger' }}">
+                            {{ ucfirst($assignment->status) }}
+                        </span>
+                    </td>
+
+                    {{-- ACTION --}}
+                    <td>
+                        <div class="d-flex justify-content-end">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-danger"
+                                onclick="confirmDelete({{ $assignment->id }})"
+                                title="Delete"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+
+                        <form
+                            id="delete-form-{{ $assignment->id }}"
+                            action="{{ route('admin.assignments.destroy',$assignment->id) }}"
+                            method="POST"
+                            class="d-none"
+                        >
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    </td>
+
+                </tr>
+
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">No assignments found</p>
+
+                        <a href="{{ route('admin.assignments.create') }}"
+                           class="btn btn-success btn-sm mt-3">
+                            <i class="fas fa-plus me-2"></i>
+                            Create Your First Assignment
+                        </a>
+                    </td>
+                </tr>
+                @endforelse
                 </tbody>
+
             </table>
         </div>
     </div>
-    
+
+    {{-- PAGINATION --}}
     @if($assignments->hasPages())
-        <div class="card-footer bg-white">
-            <div class="d-flex justify-content-center">
-                {{ $assignments->withQueryString()->links() }}
-            </div>
+    <div class="card-footer bg-white">
+        <div class="d-flex justify-content-center">
+            {{ $assignments->withQueryString()->links() }}
         </div>
+    </div>
     @endif
 </div>
 

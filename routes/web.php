@@ -36,6 +36,8 @@ use App\Http\Controllers\SuperAdmin\CampusController as SuperAdminCampusControll
 use App\Http\Controllers\SuperAdmin\AssignmentController as SuperAdminAssignmentController;
 use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservationController;
 use App\Http\Controllers\SuperAdmin\ProfileController as SuperAdminProfileController;
+use App\Http\Controllers\SuperAdmin\SuperAdminDepartmentController;
+use App\Http\Controllers\SuperAdmin\SuperAdminCourseController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -56,14 +58,11 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
     Route::resource('campuses', SuperAdminCampusController::class);
     Route::post('campuses/search', [SuperAdminCampusController::class, 'search'])->name('campuses.search');
 
-    // Super Admin Profile
-    Route::get('profile', [SuperAdminDashboardController::class, 'editProfile'])->name('profile.edit');
+    // Department Management
+    Route::resource('departments', SuperAdminDepartmentController::class); // 👈 added
 
-    // Campus Assignments
-    // Route::get('assignments', [SuperAdminAssignmentController::class, 'index'])->name('assignments.index');
-    // Route::post('assignments/assign', [SuperAdminAssignmentController::class, 'assign'])->name('assignments.assign');
-    // Route::delete('assignments/{assignment}', [SuperAdminAssignmentController::class, 'remove'])->name('assignments.remove');
-    // Route::post('assignments/bulk-assign', [SuperAdminAssignmentController::class, 'bulkAssign'])->name('assignments.bulk-assign');
+    // Course Management
+    Route::resource('courses', SuperAdminCourseController::class); // 👈 added
 
     // Reservations (global view)
     Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');
@@ -83,7 +82,6 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
     Route::get('profile/export', [SuperAdminProfileController::class, 'exportData'])->name('profile.export');
     Route::delete('profile', [SuperAdminProfileController::class, 'deleteAccount'])->name('profile.delete');
 });
-
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard

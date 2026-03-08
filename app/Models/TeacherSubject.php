@@ -14,13 +14,11 @@ class TeacherSubject extends Model
         'status'
     ];
 
-    public function teacher()
-    {
+    public function teacher(){
         return $this->belongsTo(Teacher::class);
     }
 
-    public function subject()
-    {
+    public function subject(){
         return $this->belongsTo(Subject::class);
     }
 }
