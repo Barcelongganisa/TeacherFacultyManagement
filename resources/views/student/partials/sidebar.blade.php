@@ -286,12 +286,12 @@ $profileImageUrl = $user->profile_image
                 <span>Classroom Schedule</span>
             </a>
         </li>
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a href="{{ route('student.teachers') }}" class="nav-link {{ request()->routeIs('student.teachers') ? 'active' : '' }}">
                 <i class="fas fa-chalkboard-user"></i>
                 <span>Professors</span>
             </a>
-        </li>
+        </li> --}}
         <li class="nav-item">
             <a href="{{ route('student.profile') }}" class="nav-link {{ request()->routeIs('student.profile') ? 'active' : '' }}">
                 <i class="fas fa-user"></i>
