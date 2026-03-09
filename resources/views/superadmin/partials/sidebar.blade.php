@@ -15,15 +15,15 @@ $unassignedAdminsCount = DB::table('users')
 
 <style>
 :root {
-    --primary-purple: #6f42c1;
-    --primary-purple-dark: #5a359a;
-    --light-purple: #e2d9f3;
-    --soft-purple: #f3e8ff;
+    --primary-green: #2ecc71;
+    --primary-green-dark: #27ae60;
+    --light-green: #d4edda;
+    --soft-green: #f0faf4;
     --white: #ffffff;
     --text-dark: #2c3e50;
     --text-soft: #6c757d;
-    --shadow-sm: 0 2px 4px rgba(111, 66, 193, 0.1);
-    --shadow-md: 0 4px 6px rgba(111, 66, 193, 0.15);
+    --shadow-sm: 0 2px 4px rgba(46, 204, 113, 0.1);
+    --shadow-md: 0 4px 6px rgba(46, 204, 113, 0.15);
     --transition: all 0.3s ease;
 }
 
@@ -33,10 +33,10 @@ $unassignedAdminsCount = DB::table('users')
     top: 70px;
     bottom: 0;
     width: 280px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f0faf4 100%);
     padding: 25px 20px;
-    border-right: 1px solid rgba(111, 66, 193, 0.15);
-    box-shadow: 4px 0 10px rgba(111, 66, 193, 0.05);
+    border-right: 1px solid rgba(46, 204, 113, 0.15);
+    box-shadow: 4px 0 10px rgba(46, 204, 113, 0.05);
     overflow-y: auto;
     transition: var(--transition);
     z-index: 1000;
@@ -47,26 +47,26 @@ $unassignedAdminsCount = DB::table('users')
 }
 
 .sidebar::-webkit-scrollbar-track {
-    background: var(--soft-purple);
+    background: var(--soft-green);
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-    background: var(--primary-purple);
+    background: var(--primary-green);
     border-radius: 10px;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-purple-dark);
+    background: var(--primary-green-dark);
 }
 
 /* Profile Card */
 .profile-card {
-    background: linear-gradient(145deg, var(--white), var(--soft-purple));
+    background: linear-gradient(145deg, var(--white), var(--soft-green));
     border-radius: 20px;
     padding: 25px 20px;
     margin-bottom: 30px;
     box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(111, 66, 193, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.1);
     transition: var(--transition);
     display: flex;
     flex-direction: column;
@@ -91,13 +91,13 @@ $unassignedAdminsCount = DB::table('users')
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--white);
-    box-shadow: 0 4px 10px rgba(111, 66, 193, 0.3);
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
     transition: var(--transition);
 }
 
 .profile-image:hover {
     transform: scale(1.05);
-    border-color: var(--primary-purple);
+    border-color: var(--primary-green);
 }
 
 .online-indicator {
@@ -143,14 +143,14 @@ $unassignedAdminsCount = DB::table('users')
 
 .role-badge {
     display: inline-block;
-    background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-dark));
+    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-dark));
     color: var(--white);
     padding: 8px 20px;
     border-radius: 50px;
     font-size: 0.9rem;
     font-weight: 500;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(111, 66, 193, 0.3);
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
     text-transform: uppercase;
     text-align: center;
     width: 100%;
@@ -184,7 +184,7 @@ $unassignedAdminsCount = DB::table('users')
     width: 24px;
     font-size: 1.2rem;
     margin-right: 12px;
-    color: var(--primary-purple);
+    color: var(--primary-green);
     transition: var(--transition);
 }
 
@@ -195,13 +195,13 @@ $unassignedAdminsCount = DB::table('users')
     top: 0;
     height: 100%;
     width: 0;
-    background: linear-gradient(90deg, rgba(111, 66, 193, 0.1), transparent);
+    background: linear-gradient(90deg, rgba(46, 204, 113, 0.1), transparent);
     transition: var(--transition);
     z-index: 0;
 }
 
 .nav-link:hover {
-    background: var(--soft-purple);
+    background: var(--soft-green);
     transform: translateX(5px);
 }
 
@@ -211,7 +211,7 @@ $unassignedAdminsCount = DB::table('users')
 
 .nav-link:hover i {
     transform: scale(1.1);
-    color: var(--primary-purple-dark);
+    color: var(--primary-green-dark);
 }
 
 .nav-link span {
@@ -220,9 +220,9 @@ $unassignedAdminsCount = DB::table('users')
 }
 
 .nav-link.active {
-    background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-dark));
+    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-dark));
     color: var(--white);
-    box-shadow: 0 4px 15px rgba(111, 66, 193, 0.4);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
 }
 
 .nav-link.active i {
@@ -231,7 +231,7 @@ $unassignedAdminsCount = DB::table('users')
 
 .nav-link.active:hover {
     transform: translateX(5px);
-    box-shadow: 0 6px 20px rgba(111, 66, 193, 0.5);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
 }
 
 /* Notification Badge */
@@ -249,14 +249,14 @@ $unassignedAdminsCount = DB::table('users')
 /* Divider */
 .nav-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--primary-purple), transparent);
+    background: linear-gradient(90deg, transparent, var(--primary-green), transparent);
     margin: 20px 0;
     opacity: 0.3;
 }
 
 /* Section Title */
 .nav-section-title {
-    color: var(--primary-purple-dark);
+    color: var(--primary-green-dark);
     font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -351,29 +351,19 @@ $unassignedAdminsCount = DB::table('users')
                 <span>Campuses</span>
             </a>
         </li>
-         <li class="nav-item">
+        <li class="nav-item">
             <a href="{{ route('superadmin.departments.index') }}" class="nav-link {{ request()->routeIs('superadmin.departments.*') ? 'active' : '' }}">
                 <i class="fas fa-building"></i>
                 <span>Departments</span>
             </a>
         </li>
-       <li class="nav-item">
+        <li class="nav-item">
             <a href="{{ route('superadmin.courses.index') }}" 
             class="nav-link {{ request()->routeIs('superadmin.courses.*') ? 'active' : '' }}">
                 <i class="fas fa-book-open"></i>
                 <span>Courses</span>
             </a>
         </li>
-        
-        {{-- <li class="nav-item">
-            <a href="{{ route('superadmin.assignments.index') }}" class="nav-link {{ request()->routeIs('superadmin.assignments.*') ? 'active' : '' }}">
-                <i class="fas fa-sitemap"></i>
-                <span>Campus Assignments</span>
-                @if($unassignedAdminsCount > 0)
-                    <span class="notification-badge">{{ $unassignedAdminsCount }}</span>
-                @endif
-            </a>
-        </li> --}}
 
         <div class="nav-divider"></div>
 
@@ -389,32 +379,6 @@ $unassignedAdminsCount = DB::table('users')
                 @endif
             </a>
         </li>
-
-        <div class="nav-divider"></div>
-
-        <!-- System Section -->
-        <div class="nav-section-title">SYSTEM</div>
-        
-        {{-- <li class="nav-item">
-            <a href="{{ route('superadmin.reports') }}" class="nav-link {{ request()->routeIs('superadmin.reports') ? 'active' : '' }}">
-                <i class="fas fa-chart-bar"></i>
-                <span>Reports & Analytics</span>
-            </a>
-        </li> --}}
-        
-        {{-- <li class="nav-item">
-            <a href="{{ route('superadmin.settings') }}" class="nav-link {{ request()->routeIs('superadmin.settings') ? 'active' : '' }}">
-                <i class="fas fa-cog"></i>
-                <span>System Settings</span>
-            </a>
-        </li> --}}
-        
-        {{-- <li class="nav-item">
-            <a href="{{ route('superadmin.audit-logs') }}" class="nav-link {{ request()->routeIs('superadmin.audit-logs') ? 'active' : '' }}">
-                <i class="fas fa-history"></i>
-                <span>Audit Logs</span>
-            </a>
-        </li> --}}
 
         <div class="nav-divider"></div>
 
@@ -458,32 +422,32 @@ $unassignedAdminsCount = DB::table('users')
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="helpModalLabel">
-                    <i class="fas fa-headset me-2" style="color: var(--primary-purple);"></i>
+                    <i class="fas fa-headset me-2" style="color: var(--primary-green);"></i>
                     Help & Support
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="text-center mb-4">
-                    <i class="fas fa-crown" style="font-size: 3rem; color: var(--primary-purple);"></i>
+                    <i class="fas fa-crown" style="font-size: 3rem; color: var(--primary-green);"></i>
                 </div>
                 
                 <h6>Super Admin Quick Guide:</h6>
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <i class="fas fa-check-circle text-purple me-2"></i>
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-green);"></i>
                         <strong>User Management:</strong> Create, edit, or deactivate user accounts
                     </li>
                     <li class="mb-2">
-                        <i class="fas fa-check-circle text-purple me-2"></i>
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-green);"></i>
                         <strong>Campus Management:</strong> Add new campuses and assign admins
                     </li>
                     <li class="mb-2">
-                        <i class="fas fa-check-circle text-purple me-2"></i>
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-green);"></i>
                         <strong>Reservations:</strong> Monitor and manage all room reservations
                     </li>
                     <li class="mb-2">
-                        <i class="fas fa-check-circle text-purple me-2"></i>
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-green);"></i>
                         <strong>Reports:</strong> View system-wide analytics and statistics
                     </li>
                 </ul>
@@ -501,7 +465,7 @@ $unassignedAdminsCount = DB::table('users')
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a href="#" class="btn btn-primary" onclick="window.location.href='mailto:superadmin@cms.edu'">
+                <a href="#" class="btn btn-success" onclick="window.location.href='mailto:superadmin@cms.edu'">
                     <i class="fas fa-envelope"></i> Contact Support
                 </a>
             </div>

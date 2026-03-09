@@ -8,16 +8,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-purple: #6f42c1;
-            --primary-purple-dark: #5a359a;
+            --primary-green: #2ecc71;
+            --primary-green-dark: #27ae60;
             --primary-orange: #fd7e14;
-            --light-purple: #e2d9f3;
-            --soft-purple: #f3e8ff;
+            --light-green: #d4edda;
+            --soft-green: #f0faf4;
             --white: #ffffff;
             --text-dark: #2c3e50;
             --text-soft: #6c757d;
-            --shadow-sm: 0 2px 4px rgba(111, 66, 193, 0.1);
-            --shadow-md: 0 4px 6px rgba(111, 66, 193, 0.15);
+            --shadow-sm: 0 2px 4px rgba(46, 204, 113, 0.1);
+            --shadow-md: 0 4px 6px rgba(46, 204, 113, 0.15);
             --transition: all 0.3s ease;
             --sidebar-width: 280px;
         }
@@ -42,7 +42,7 @@
 
         /* Navbar */
         .navbar {
-            background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-dark));
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-green-dark));
             padding: 0.5rem 1rem;
             position: fixed;
             top: 0;
@@ -95,7 +95,7 @@
 
         .card-header {
             background: white;
-            border-bottom: 1px solid rgba(111, 66, 193, 0.1);
+            border-bottom: 1px solid rgba(46, 204, 113, 0.1);
             padding: 1.25rem 1.5rem;
             border-radius: 15px 15px 0 0 !important;
         }
@@ -107,7 +107,7 @@
         }
 
         .card-header h5 i {
-            color: var(--primary-purple);
+            color: var(--primary-green);
         }
 
         .card-body {
@@ -116,7 +116,7 @@
 
         /* Buttons */
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-dark));
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-green-dark));
             border: none;
             color: white;
             padding: 0.5rem 1.5rem;
@@ -126,14 +126,14 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-purple-dark), var(--primary-purple));
+            background: linear-gradient(135deg, var(--primary-green-dark), var(--primary-green));
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
 
         .btn-outline-primary {
-            border: 1px solid var(--primary-purple);
-            color: var(--primary-purple);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
             background: transparent;
             padding: 0.5rem 1.5rem;
             border-radius: 8px;
@@ -142,7 +142,7 @@
         }
 
         .btn-outline-primary:hover {
-            background: var(--primary-purple);
+            background: var(--primary-green);
             color: white;
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
@@ -197,18 +197,18 @@
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--primary-purple);
+            border-bottom: 2px solid var(--primary-green);
             padding: 1rem;
         }
 
         .table tbody td {
             padding: 1rem;
             vertical-align: middle;
-            border-bottom: 1px solid rgba(111, 66, 193, 0.1);
+            border-bottom: 1px solid rgba(46, 204, 113, 0.1);
         }
 
         .table tbody tr:hover {
-            background: var(--soft-purple);
+            background: var(--soft-green);
         }
 
         /* Badges */
@@ -235,8 +235,8 @@
             background: #3498db !important;
         }
 
-        .badge.bg-purple {
-            background: var(--primary-purple) !important;
+        .badge.bg-green {
+            background: var(--primary-green) !important;
             color: white;
         }
 
@@ -255,8 +255,8 @@
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: var(--primary-purple);
-            box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
         }
 
         /* Alerts */
@@ -296,7 +296,7 @@
         }
 
         .page-header h1 i {
-            color: var(--primary-purple);
+            color: var(--primary-green);
         }
 
         .page-header p {
@@ -310,20 +310,20 @@
         }
 
         .page-link {
-            color: var(--primary-purple);
-            border: 1px solid rgba(111, 66, 193, 0.2);
+            color: var(--primary-green);
+            border: 1px solid rgba(46, 204, 113, 0.2);
             padding: 0.5rem 1rem;
         }
 
         .page-link:hover {
-            background: var(--soft-purple);
-            color: var(--primary-purple-dark);
-            border-color: var(--primary-purple);
+            background: var(--soft-green);
+            color: var(--primary-green-dark);
+            border-color: var(--primary-green);
         }
 
         .page-item.active .page-link {
-            background: var(--primary-purple);
-            border-color: var(--primary-purple);
+            background: var(--primary-green);
+            border-color: var(--primary-green);
             color: white;
         }
 
@@ -381,16 +381,16 @@
             gap: 1rem;
         }
 
-        .text-purple {
-            color: var(--primary-purple);
+        .text-green {
+            color: var(--primary-green);
         }
 
-        .bg-soft-purple {
-            background: var(--soft-purple);
+        .bg-soft-green {
+            background: var(--soft-green);
         }
 
-        .border-purple {
-            border-color: var(--primary-purple) !important;
+        .border-green {
+            border-color: var(--primary-green) !important;
         }
 
         /* Loading Spinner */
@@ -414,8 +414,8 @@
         .spinner {
             width: 50px;
             height: 50px;
-            border: 5px solid var(--light-purple);
-            border-top-color: var(--primary-purple);
+            border: 5px solid var(--light-green);
+            border-top-color: var(--primary-green);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
