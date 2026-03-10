@@ -1,15 +1,15 @@
 @extends('superadmin.layouts.app')
 
-@section('title', 'Department Management - Super Admin')
+@section('title', 'Colleges Management - Super Admin')
 
 @section('page-header')
     <div class="flex-between">
         <div>
-            <h1><i class="fas fa-building me-2"></i>Department Management</h1>
-            <p class="text-muted">Manage all departments across campuses</p>
+            <h1><i class="fas fa-building me-2"></i>Colleges Management</h1>
+            <p class="text-muted">Manage all colleges across campuses</p>
         </div>
         <a href="{{ route('superadmin.departments.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus-circle me-2"></i>Add New Department
+            <i class="fas fa-plus-circle me-2"></i>Add New Colleges
         </a>
     </div>
 @endsection
@@ -36,7 +36,7 @@
     <div class="card">
         <div class="card-header">
             <div class="flex-between">
-                <h5><i class="fas fa-list me-2"></i>Departments List</h5>
+                <h5><i class="fas fa-list me-2"></i>Colleges List</h5>
                 <form method="GET" action="{{ route('superadmin.departments.index') }}" class="d-flex gap-2">
                     <select name="campus_id" class="form-select form-select-sm" style="width: 180px;">
                         <option value="">All Campuses</option>
@@ -48,7 +48,7 @@
                         @endforeach
                     </select>
                     <input type="text" name="search" class="form-control form-control-sm"
-                           placeholder="Search departments..." value="{{ request('search') }}" style="width: 220px;">
+                           placeholder="Search colleges..." value="{{ request('search') }}" style="width: 220px;">
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="fas fa-search"></i>
                     </button>
@@ -66,7 +66,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Department</th>
+                            <th>Colleges</th>
                             <th>Code</th>
                             <th>Campus</th>
                             <th class="text-center">Courses</th>
@@ -109,7 +109,7 @@
                                 <i class="fas fa-building fa-3x mb-3 d-block"></i>
                                 <p>No departments found</p>
                                 <a href="{{ route('superadmin.departments.create') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle me-2"></i>Add Your First Department
+                                    <i class="fas fa-plus-circle me-2"></i>Add Your First Colleges
                                 </a>
                             </td>
                         </tr>

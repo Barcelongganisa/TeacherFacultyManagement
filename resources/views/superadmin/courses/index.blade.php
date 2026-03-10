@@ -6,7 +6,7 @@
     <div class="flex-between">
         <div>
             <h1><i class="fas fa-book-open me-2"></i>Course Management</h1>
-            <p class="text-muted">Manage all courses across departments</p>
+            <p class="text-muted">Manage all courses across colleges</p>
         </div>
         <a href="{{ route('superadmin.courses.create') }}" class="btn btn-primary">
             <i class="fas fa-plus-circle me-2"></i>Add New Course
@@ -75,7 +75,7 @@
                             <th>#</th>
                             <th>Course</th>
                             <th>Code</th>
-                            <th>Department</th>
+                            <th>Colleges</th>
                             <th>Campus</th>
                             <th>Coordinator</th>
                             <th>Status</th>

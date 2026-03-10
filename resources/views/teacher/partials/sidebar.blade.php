@@ -6,9 +6,11 @@ $teacher = DB::table('teachers')->where('user_id', $user->id)->first();
 $profileImageUrl = $user->profile_image
     ? asset('storage/' . $user->profile_image)
     : asset('assets/img/default-avatar.png');
-
-// ✅ Use $teacher->name since that's the only name column on teachers table
 $displayName = $teacher->name ?? $user->name ?? 'Teacher';
+$role = null;
+if($user->role == 'teacher'){
+    $role = 'Professor';
+}
 @endphp
 
 <style>
@@ -312,7 +314,6 @@ $displayName = $teacher->name ?? $user->name ?? 'Teacher';
 </style>
 
 <div class="sidebar">
-    <!-- Profile Section -->
     <div class="profile-card">
         <div class="profile-image-wrapper">
             <img src="{{ $profileImageUrl }}" class="profile-image" alt="{{ $displayName }}">
@@ -320,9 +321,7 @@ $displayName = $teacher->name ?? $user->name ?? 'Teacher';
         </div>
         <h3 class="profile-name">{{ $displayName }}</h3>
         <p class="profile-email">{{ $user->email }}</p>
-        @if($user->role)
-            <span class="department-badge">{{ ucfirst($user->role) }}</span>
-        @endif
+        <span class="department-badge">{{ ucfirst($role) }}</span>
         <span class="role-badge" style="margin-top: 10px;">{{ $campuses }}</span>
     </div>
 

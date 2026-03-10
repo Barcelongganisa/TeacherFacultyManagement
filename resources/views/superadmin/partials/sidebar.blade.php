@@ -354,7 +354,7 @@ $unassignedAdminsCount = DB::table('users')
         <li class="nav-item">
             <a href="{{ route('superadmin.departments.index') }}" class="nav-link {{ request()->routeIs('superadmin.departments.*') ? 'active' : '' }}">
                 <i class="fas fa-building"></i>
-                <span>Departments</span>
+                <span>Colleges</span>
             </a>
         </li>
         <li class="nav-item">
