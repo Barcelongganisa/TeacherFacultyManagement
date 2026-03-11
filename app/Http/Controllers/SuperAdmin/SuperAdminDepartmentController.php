@@ -6,132 +6,93 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
-class SuperAdminCourseController extends Controller
+class SuperAdminDepartmentController extends Controller
 {
     public function index(Request $request){
-        $query = DB::table('courses')
-            ->join('departments', 'courses.department_id', '=', 'departments.id')
+        $query = DB::table('departments')
             ->join('campuses', 'departments.campus_id', '=', 'campuses.id')
-            ->leftJoin('users', 'courses.coordinator_id', '=', 'users.id')
-            ->select( 'courses.*','departments.name as department_name','campuses.campus_name',
-                'users.name as coordinator_name')
-            ->orderBy('courses.created_at', 'desc');
+            ->select('departments.*', 'campuses.campus_name')
+            ->orderBy('departments.name');
         if ($request->search) {
-            $query->where('courses.name', 'like', '%' . $request->search . '%')
-                ->orWhere('courses.code', 'like', '%' . $request->search . '%');
+            $query->where('departments.name', 'like', '%' . $request->search . '%')
+                ->orWhere('departments.code', 'like', '%' . $request->search . '%');
         }
-        if ($request->department_id) {
-            $query->where('courses.department_id', $request->department_id);
+        if ($request->campus_id) {
+            $query->where('departments.campus_id', $request->campus_id);
         }
-        if ($request->status) {
-            $query->where('courses.status', $request->status);
-        }
-        $courses = $query->paginate(10);
-        $departments = DB::table('departments')->orderBy('name')->get();
-        return view('superadmin.courses.index', compact('courses', 'departments'));
+
+        $departments = $query->paginate(10);
+        $campuses = DB::table('campuses')->orderBy('campus_name')->get();
+        return view('superadmin.departments.index', compact('departments', 'campuses'));
     }
 
     public function create(){
         $campuses = DB::table('campuses')->orderBy('campus_name')->get();
-        $departments = DB::table('departments')->orderBy('name')->get();
-        $coordinators = DB::table('users')->where('role', 'admin')->orderBy('name')->get();
-        return view('superadmin.courses.create', compact('campuses', 'departments', 'coordinators'));
-    }
-    
-    public function show($id){
-        $course = DB::table('courses')
-            ->join('departments', 'courses.department_id', '=', 'departments.id')
-            ->join('campuses', 'departments.campus_id', '=', 'campuses.id')
-            ->leftJoin('users', 'courses.coordinator_id', '=', 'users.id')
-            ->select('courses.*','departments.name as department_name',
-                'departments.campus_id',
-                'campuses.campus_name',
-                'campuses.campus_code',
-                'users.name as coordinator_name',
-                'users.email as coordinator_email'
-            )
-            ->where('courses.id', $id)
-            ->first();
-    
-        if (!$course) {
-            return redirect()->route('superadmin.courses.index')->with('error', 'Course not found.');
-        }
-    
-        return view('superadmin.courses.show', compact('course'));
-    }
-    
-    public function edit($id)
-    {
-        $course = DB::table('courses')->where('id', $id)->first();
-    
-        if (!$course) {
-            return redirect()->route('superadmin.courses.index')->with('error', 'Course not found.');
-        }
-    
-        $campuses     = DB::table('campuses')->orderBy('campus_name')->get();
-        $departments  = DB::table('departments')->orderBy('name')->get();
-        $coordinators = DB::table('users')->where('role', 'admin')->orderBy('name')->get();
-    
-        return view('superadmin.courses.edit', compact('course', 'campuses', 'departments', 'coordinators'));
-    }
-    
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name'           => 'required|string|max:255',
-            'code'           => 'required|string|max:20|unique:courses,code,' . $id,
-            'description'    => 'nullable|string',
-            'status'         => 'required|in:active,inactive,archived',
-            'coordinator_id' => 'nullable|exists:users,id',
-            'department_id'  => 'required|exists:departments,id',
-        ]);
-    
-        DB::table('courses')->where('id', $id)->update([
-            'name'           => $request->name,
-            'code'           => strtoupper($request->code),
-            'description'    => $request->description,
-            'status'         => $request->status,
-            'coordinator_id' => $request->coordinator_id,
-            'department_id'  => $request->department_id,
-            'updated_at'     => now(),
-        ]);
-    
-        return redirect()->route('superadmin.courses.show', $id)->with('success', 'Course updated successfully.');
-    }
-    
-    public function destroy($id)
-    {
-        $course = DB::table('courses')->where('id', $id)->first();
-    
-        if (!$course) {
-            return redirect()->route('superadmin.courses.index')->with('error', 'Course not found.');
-        }
-    
-        DB::table('courses')->where('id', $id)->delete();
-    
-        return redirect()->route('superadmin.courses.index')->with('success', 'Course deleted successfully.');
+        return view('superadmin.departments.create', compact('campuses'));
     }
 
     public function store(Request $request){
         $request->validate([
-            'name'=> 'required|string|max:255',
-            'code' => 'required|string|max:20|unique:courses,code',
-            'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive,archived',
-            'coordinator_id' => 'nullable|exists:users,id',
-            'department_id' => 'required|exists:departments,id',
-        ]);
-        DB::table('courses')->insert([
-            'name'=> $request->name,
-            'code'  => strtoupper($request->code),
-            'description' => $request->description,
-            'status' => $request->status,
-            'coordinator_id'=> $request->coordinator_id,
-            'department_id'=> $request->department_id,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'name' => 'required|string|max:255',
+            'code'=> 'required|string|max:20|unique:departments,code',
+            'campus_id'=> 'required|exists:campuses,id',
         ]);
 
-        return redirect()->route('superadmin.courses.index')->with('success', 'Course created successfully.');
+        DB::table('departments')->insert([
+            'name' => $request->name,
+            'code' => strtoupper($request->code),
+            'campus_id' => $request->campus_id,
+            'created_at'=> now(),
+            'updated_at'=> now(),
+        ]);
+
+        return redirect()->route('superadmin.departments.index')
+            ->with('success', 'College created successfully.');
+    }
+
+    public function show($id){
+        $department = DB::table('departments')
+            ->join('campuses', 'departments.campus_id', '=', 'campuses.id')
+            ->select('departments.*', 'campuses.campus_name')
+            ->where('departments.id', $id)
+            ->first();
+
+        if (!$department) {
+            return redirect()->route('superadmin.departments.index')
+                ->with('error', 'College not found.');
+        }
+
+        $courses = DB::table('courses')
+            ->where('department_id', $id)
+            ->get();
+
+        return view('superadmin.departments.show', compact('department', 'courses'));
+    }
+
+    public function edit($id){
+        $department = DB::table('departments')->where('id', $id)->first();
+        if (!$department) {
+            return redirect()->route('superadmin.departments.index')
+                ->with('error', 'College not found.');
+        }
+        $campuses = DB::table('campuses')->orderBy('campus_name')->get();
+        return view('superadmin.departments.edit', compact('department', 'campuses'));
+    }
+
+    public function update(Request $request, $id){
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:20|unique:departments,code,' . $id,
+            'campus_id' => 'required|exists:campuses,id',
+        ]);
+
+        DB::table('departments')->where('id', $id)->update([
+            'name' => $request->name,
+            'code'=> strtoupper($request->code),
+            'campus_id' => $request->campus_id,
+            'updated_at'=> now(),
+        ]);
+        return redirect()->route('superadmin.departments.show', $id)
+            ->with('success', 'College updated successfully.');
     }
 }

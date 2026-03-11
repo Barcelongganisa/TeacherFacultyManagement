@@ -82,7 +82,6 @@
             </div>
         </div>
 
-        {{-- Courses Card --}}
         <div class="col-lg-7 mb-4">
             <div class="card h-100">
                 <div class="card-header">
@@ -131,37 +130,6 @@
                 </div>
             </div>
         </div>
-
     </div>
-
-    {{-- Danger Zone --}}
-    <div class="card border-danger">
-        <div class="card-header bg-danger bg-opacity-10">
-            <h5 class="text-danger mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
-        </div>
-        <div class="card-body">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <strong>Delete this department</strong>
-                    <p class="text-muted small mb-0">
-                        Permanently remove this department. This action cannot be undone.
-                        @if($courses->isNotEmpty())
-                            <span class="text-danger">This department has {{ $courses->count() }} course(s) linked to it.</span>
-                        @endif
-                    </p>
-                </div>
-                <form action="{{ route('superadmin.departments.destroy', $department->id) }}" method="POST"
-                      onsubmit="return confirm('Are you sure you want to delete \'{{ $department->name }}\'? This action cannot be undone.')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm"
-                        {{ $courses->isNotEmpty() ? 'disabled title=Cannot delete a department with existing courses' : '' }}>
-                        <i class="fas fa-trash me-1"></i>Delete Department
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
 </div>
 @endsection

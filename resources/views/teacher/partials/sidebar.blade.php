@@ -345,13 +345,6 @@ if($user->role == 'teacher'){
         </li>
         
         <li class="nav-item">
-            <a href="{{ route('teacher.current-assignment') }}" class="nav-link {{ request()->routeIs('teacher.current-assignment') ? 'active' : '' }}">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <span>Current Assignment</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
             <a href="{{ route('teacher.subjects') }}" class="nav-link {{ request()->routeIs('teacher.subjects') ? 'active' : '' }}">
                 <i class="fas fa-book"></i>
                 <span>My Subjects</span>
@@ -360,26 +353,6 @@ if($user->role == 'teacher'){
 
         <div class="nav-divider"></div>
 
-        <!-- Resources Section -->
-        <div class="nav-section-title">RESOURCES</div>
-        
-        <li class="nav-item">
-            <a href="{{ route('teacher.reservations') }}" class="nav-link {{ request()->routeIs('teacher.reservations') ? 'active' : '' }}">
-                <i class="fas fa-door-open"></i>
-                <span>Room Reservations</span>
-                @php
-                    // Optional: Get pending reservations count
-                    $pendingCount = DB::table('reservations')
-                        ->join('teachers', 'reservations.teacher_id', '=', 'teachers.id')
-                        ->where('teachers.user_id', $user->id)
-                        ->where('reservations.status', 'pending')
-                        ->count();
-                @endphp
-                @if(isset($pendingCount) && $pendingCount > 0)
-                    <span class="notification-badge">{{ $pendingCount }}</span>
-                @endif
-            </a>
-        </li>
         
         {{-- <li class="nav-item">
             <a href="{{ route('teacher.availability') }}" class="nav-link {{ request()->routeIs('teacher.availability') ? 'active' : '' }}">
@@ -442,10 +415,6 @@ if($user->role == 'teacher'){
                     <li class="mb-2">
                         <i class="fas fa-check-circle text-success me-2"></i>
                         View your teaching schedule in the "My Schedule" section
-                    </li>
-                    <li class="mb-2">
-                        <i class="fas fa-check-circle text-success me-2"></i>
-                        Check your current class in "Current Assignment"
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-check-circle text-success me-2"></i>

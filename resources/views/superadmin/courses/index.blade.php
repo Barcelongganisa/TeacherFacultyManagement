@@ -32,7 +32,6 @@
         </div>
     @endif
 
-    <!-- Courses Table -->
     <div class="card">
         <div class="card-header">
             <div class="flex-between">
@@ -132,14 +131,6 @@
                                        class="btn btn-outline-info" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <form action="{{ route('superadmin.courses.destroy', $course->id) }}"
-                                          method="POST" class="d-inline"
-                                          onsubmit="return confirm('Delete {{ $course->name }}?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-outline-danger" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>

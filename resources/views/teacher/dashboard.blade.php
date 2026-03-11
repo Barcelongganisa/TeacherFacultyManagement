@@ -13,9 +13,9 @@
 <div class="alert alert-success alert-dismissible fade show" role="alert">
     <h4 class="alert-heading">Current Class Assignment</h4>
     <p class="mb-0">
-        <strong>Subject:</strong> {{ $currentAssignment->subject_name }}<br>
-        <strong>Room:</strong> {{ $currentAssignment->room_number }} - {{ $currentAssignment->room_name }}<br>
-        <strong>Time:</strong> {{ substr($currentAssignment->start_time, 0, 5) }} - {{ substr($currentAssignment->end_time, 0, 5) }}
+        <strong>Subject:</strong> {{ $currentAssignment->subject->subject_name ?? 'N/A' }}<br>
+        <strong>Room:</strong> {{ $currentAssignment->classroom->room_number ?? 'N/A' }} - {{ $currentAssignment->classroom->room_name ?? '' }}<br>
+        <strong>Time:</strong> {{ substr($currentAssignment->timeSlot->start_time ?? '', 0, 5) }} - {{ substr($currentAssignment->timeSlot->end_time ?? '', 0, 5) }}
     </p>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
@@ -84,7 +84,7 @@
                         <ul class="list-group">
                             @foreach($todayClasses as $tc)
                                 <li class="list-group-item">
-                                    <strong>{{ $tc->slot_name }}</strong>
+                                    <strong>{{ $tc->interval_time }}</strong>
                                     &nbsp;{{ substr($tc->start_time, 0, 5) }} - {{ substr($tc->end_time, 0, 5) }}
                                     <br>
                                     {{ $tc->subject_name }} — <small>{{ $tc->room_number }} {{ $tc->room_name }}</small>
@@ -112,7 +112,7 @@
                     @foreach($upcomingClasses as $uc)
                         <li class="list-group-item">
                             <strong>{{ $uc->day_of_week }}</strong>
-                            &nbsp;{{ $uc->slot_name }} ({{ substr($uc->start_time, 0, 5) }})
+                            &nbsp;{{ $uc->interval_time }} ({{ substr($uc->start_time, 0, 5) }})
                             <br>
                             {{ $uc->subject_name }} — <small>{{ $uc->room_number }} {{ $uc->room_name }}</small>
                         </li>

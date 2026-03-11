@@ -44,16 +44,6 @@ use Illuminate\Support\Facades\DB;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/debug-student-schedule', function () {
-    $user = Auth::user();
-
-    return response()->json([
-        'schedules_teacher_ids' => DB::table('schedules')->pluck('teacher_id'),  // what's in schedules
-        'teachers_ids'          => DB::table('teachers')->pluck('id'),            // what's in teachers
-        'users_ids'             => DB::table('users')->pluck('id'),               // what's in users
-    ]);
-});
-
 // Super Admin Routes
 Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->name('superadmin.')->group(function () {
     // Dashboard
@@ -71,7 +61,6 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
 
     Route::resource('departments', SuperAdminDepartmentController::class);
     Route::resource('courses', SuperAdminCourseController::class);
-
     // Reservations (global view)
     Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');
     Route::get('reservations/{reservation}', [SuperAdminReservationController::class, 'show'])->name('reservations.show'); 

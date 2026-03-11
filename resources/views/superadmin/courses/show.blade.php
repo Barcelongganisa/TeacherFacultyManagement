@@ -1,19 +1,19 @@
 @extends('superadmin.layouts.app')
 
-@section('title', 'Department Details - Super Admin')
+@section('title', 'Course Details - Super Admin')
 
 @section('page-header')
     <div class="flex-between">
         <div>
-            <h1><i class="fas fa-building me-2"></i>Department Details</h1>
-            <p class="text-muted">Viewing details for {{ $department->name }}</p>
+            <h1><i class="fas fa-book-open me-2"></i>Course Details</h1>
+            <p class="text-muted">Viewing details for {{ $course->name }}</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('superadmin.departments.edit', $department->id) }}" class="btn btn-primary">
-                <i class="fas fa-edit me-2"></i>Edit Department
+            <a href="{{ route('superadmin.courses.edit', $course->id) }}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Edit Course
             </a>
-            <a href="{{ route('superadmin.departments.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Departments
+            <a href="{{ route('superadmin.courses.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Courses
             </a>
         </div>
     </div>
@@ -32,48 +32,65 @@
 
     <div class="row">
 
-        {{-- Department Info Card --}}
+        {{-- Course Info Card --}}
         <div class="col-lg-5 mb-4">
             <div class="card h-100">
                 <div class="card-header">
-                    <h5><i class="fas fa-info-circle me-2"></i>Department Information</h5>
+                    <h5><i class="fas fa-info-circle me-2"></i>Course Information</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless mb-0">
                         <tbody>
                             <tr>
-                                <td class="fw-semibold text-muted" style="width: 40%;">Department Name</td>
-                                <td><strong>{{ $department->name }}</strong></td>
+                                <td class="fw-semibold text-muted" style="width: 40%;">Course Name</td>
+                                <td><strong>{{ $course->name }}</strong></td>
                             </tr>
                             <tr>
                                 <td class="fw-semibold text-muted">Code</td>
-                                <td><code>{{ $department->code }}</code></td>
+                                <td><code>{{ $course->code }}</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-muted">Status</td>
+                                <td>
+                                    @if($course->status == 'active')
+                                        <span class="badge bg-success">Active</span>
+                                    @elseif($course->status == 'inactive')
+                                        <span class="badge bg-warning">Inactive</span>
+                                    @else
+                                        <span class="badge bg-secondary">Archived</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-muted">College</td>
+                                <td>{{ $course->department_name ?? '—' }}</td>
                             </tr>
                             <tr>
                                 <td class="fw-semibold text-muted">Campus</td>
                                 <td>
                                     <i class="fas fa-university me-1 text-muted"></i>
-                                    {{ $department->campus_name ?? '—' }}
+                                    {{ $course->campus_name ?? '—' }}
+                                    @if($course->campus_code)
+                                        <code class="ms-1">{{ $course->campus_code }}</code>
+                                    @endif
                                 </td>
                             </tr>
+                            @if($course->description)
                             <tr>
-                                <td class="fw-semibold text-muted">Total Courses</td>
-                                <td>
-                                    <span class="badge bg-primary">
-                                        {{ $courses->count() }}
-                                    </span>
-                                </td>
-                            </tr>
-                            @if($department->created_at)
-                            <tr>
-                                <td class="fw-semibold text-muted">Created</td>
-                                <td>{{ date('M d, Y', strtotime($department->created_at)) }}</td>
+                                <td class="fw-semibold text-muted">Description</td>
+                                <td>{{ $course->description }}</td>
                             </tr>
                             @endif
-                            @if($department->updated_at)
+                            @if($course->created_at)
+                            <tr>
+                                <td class="fw-semibold text-muted">Created</td>
+                                <td>{{ date('M d, Y', strtotime($course->created_at)) }}</td>
+                            </tr>
+                            @endif
+                            @if($course->updated_at)
                             <tr>
                                 <td class="fw-semibold text-muted">Last Updated</td>
-                                <td>{{ date('M d, Y', strtotime($department->updated_at)) }}</td>
+                                <td>{{ date('M d, Y', strtotime($course->updated_at)) }}</td>
                             </tr>
                             @endif
                         </tbody>
@@ -82,50 +99,46 @@
             </div>
         </div>
 
-        {{-- Courses Card --}}
+        {{-- Coordinator Card --}}
         <div class="col-lg-7 mb-4">
             <div class="card h-100">
                 <div class="card-header">
-                    <div class="flex-between">
-                        <h5><i class="fas fa-book me-2"></i>Courses Under This Department</h5>
-                        {{-- Adjust route name to match your courses create route --}}
-                        @if(Route::has('superadmin.courses.create'))
-                            <a href="{{ route('superadmin.courses.create') }}?department_id={{ $department->id }}"
-                               class="btn btn-sm btn-primary">
-                                <i class="fas fa-plus me-1"></i>Add Course
-                            </a>
-                        @endif
-                    </div>
+                    <h5><i class="fas fa-user-tie me-2"></i>Coordinator Information</h5>
                 </div>
                 <div class="card-body">
-                    @if($courses->isEmpty())
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-book-open fa-3x mb-3 d-block"></i>
-                            <p>No courses found for this department.</p>
+                    @if($course->coordinator_name)
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                                 style="width:56px;height:56px;font-size:22px;flex-shrink:0;">
+                                {{ strtoupper(substr($course->coordinator_name, 0, 1)) }}
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ $course->coordinator_name }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    {{ $course->coordinator_email ?? 'No email on record' }}
+                                </small>
+                            </div>
                         </div>
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-semibold text-muted" style="width: 40%;">Name</td>
+                                    <td>{{ $course->coordinator_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold text-muted">Email</td>
+                                    <td>{{ $course->coordinator_email ?? '—' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     @else
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Course Name</th>
-                                        <th>Code</th>
-                                        @if(isset($courses->first()->actions))
-                                            <th>Actions</th>
-                                        @endif
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($courses as $course)
-                                    <tr>
-                                        <td class="text-muted small">{{ $loop->iteration }}</td>
-                                        <td><strong>{{ $course->name }}</strong></td>
-                                        <td><code>{{ $course->code }}</code></td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-user-slash fa-3x mb-3 d-block"></i>
+                            <p>No coordinator assigned to this course.</p>
+                            <a href="{{ route('superadmin.courses.edit', $course->id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus me-1"></i>Assign Coordinator
+                            </a>
                         </div>
                     @endif
                 </div>

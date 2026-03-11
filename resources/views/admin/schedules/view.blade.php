@@ -47,10 +47,16 @@
                     @foreach($timeSlots as $timeSlot)
                         <tr>
                             <td class="time-slot bg-soft-green">
-                                <div class="text-center">
-                                    <strong>{{ $timeSlot->slot_name }}</strong><br>
-                                    <small>{{ \Carbon\Carbon::parse($timeSlot->start_time)->format('g:i A') }} - 
-                                           {{ \Carbon\Carbon::parse($timeSlot->end_time)->format('g:i A') }}</small>
+                                <div class="text-center interval-time">
+                                    <div class="interval-start">
+                                        {{ \Carbon\Carbon::parse($timeSlot->start_time)->format('g:i A') }}
+                                    </div>
+                                    <div class="interval-main">
+                                        {{ $timeSlot->interval_time }}
+                                    </div>
+                                    <div class="interval-end">
+                                        {{ \Carbon\Carbon::parse($timeSlot->end_time)->format('g:i A') }}
+                                    </div>
                                 </div>
                             </td>
                             @foreach($days as $day)
@@ -131,7 +137,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="add_day_of_week" class="form-label">Day of Week <span class="text-danger">*</span></label>
@@ -148,14 +154,14 @@
                                 <option value="">Select Time Slot</option>
                                 @foreach($timeSlots as $slot)
                                     <option value="{{ $slot->id }}">
-                                        {{ $slot->slot_name }} ({{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }} - 
+                                        {{ $slot->interval_time }} ({{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }} -
                                         {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }})
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="add_status" class="form-label">Status</label>
                         <select class="form-select" id="add_status" name="status">
@@ -164,7 +170,7 @@
                             <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
-                    
+
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
                         This will check for scheduling conflicts automatically.
@@ -194,7 +200,7 @@
                 @method('PUT')
                 <div class="modal-body">
                     <input type="hidden" id="edit_schedule_id" name="schedule_id">
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="edit_subject_id" class="form-label">Subject <span class="text-danger">*</span></label>
@@ -219,7 +225,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="edit_day_of_week" class="form-label">Day of Week <span class="text-danger">*</span></label>
@@ -236,14 +242,14 @@
                                 <option value="">Select Time Slot</option>
                                 @foreach($timeSlots as $slot)
                                     <option value="{{ $slot->id }}">
-                                        {{ $slot->slot_name }} ({{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }} - 
+                                        {{ $slot->interval_time }} ({{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }} -
                                         {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }})
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="edit_status" class="form-label">Status</label>
                         <select class="form-select" id="edit_status" name="status">
@@ -265,7 +271,7 @@
                     </div>
                 </div>
             </form>
-            
+
             <form id="deleteScheduleForm" method="POST" style="display: none;">
                 @csrf
                 @method('DELETE')
@@ -293,8 +299,36 @@
     background-color: #e8f8f5;
     border: 1px solid #27ae60;
     font-size: 0.85rem;
-    padding: 20px 8px;
+    padding: 12px 8px;
     vertical-align: middle;
+}
+
+/* Interval Time Styles */
+.interval-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.interval-start {
+    font-size: 0.72rem;
+    color: #555;
+    font-weight: 400;
+}
+
+.interval-main {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #155724;
+    line-height: 1.2;
+}
+
+.interval-end {
+    font-size: 0.72rem;
+    color: #555;
+    font-weight: 400;
 }
 
 .schedule-cell {
@@ -372,17 +406,26 @@
     .schedule-grid {
         font-size: 0.75rem;
     }
-    
+
     .schedule-cell {
         width: 100px;
         height: 80px;
     }
-    
+
     .subject-code {
         font-size: 0.7rem;
     }
-    
+
     .subject-name {
+        font-size: 0.65rem;
+    }
+
+    .interval-main {
+        font-size: 0.9rem;
+    }
+
+    .interval-start,
+    .interval-end {
         font-size: 0.65rem;
     }
 }
@@ -393,7 +436,6 @@
 <script>
 let currentScheduleId = null;
 
-// Initialize editable blocks
 $(document).ready(function() {
     $('.editable-block').click(function() {
         const scheduleId = $(this).data('schedule-id');
@@ -409,8 +451,7 @@ function openAddScheduleModal() {
 
 function openEditModal(scheduleId) {
     currentScheduleId = scheduleId;
-    
-    // Fetch schedule data
+
     $.ajax({
         url: '{{ url("admin/schedules/get-data") }}/' + scheduleId,
         method: 'GET',
@@ -422,11 +463,10 @@ function openEditModal(scheduleId) {
                 $('#edit_day_of_week').val(response.day_of_week);
                 $('#edit_time_slot_id').val(response.time_slot_id);
                 $('#edit_status').val(response.status);
-                
-                // Update form action
+
                 $('#editScheduleForm').attr('action', '{{ url("admin/schedules") }}/' + scheduleId);
                 $('#deleteScheduleForm').attr('action', '{{ url("admin/schedules") }}/' + scheduleId);
-                
+
                 $('#editScheduleModal').modal('show');
             } else {
                 alert('Error loading schedule data');

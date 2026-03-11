@@ -459,13 +459,13 @@ $displayName = $user->name ?? $user->username ?? 'Administrator';
                 <span>Teacher Assignments</span>
             </a>
         </li>
-        
-        <li class="nav-item">
+
+        {{-- <li class="nav-item">
             <a href="{{ route('admin.time-slots.index') }}" class="nav-link {{ request()->routeIs('admin.time-slots.*') ? 'active' : '' }}">
                 <i class="fas fa-clock"></i>
                 <span>Time Slots</span>
             </a>
-        </li>
+        </li> --}}
 
         <div class="nav-divider"></div>
 
