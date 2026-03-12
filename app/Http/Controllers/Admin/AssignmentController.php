@@ -7,6 +7,9 @@ use App\Models\Subject;
 use App\Models\TeacherSubject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Classroom;
+use App\Models\TimeSlot;
+use App\Http\Controllers\Teacher\StudentSubjectController;
 
 class AssignmentController extends AdminBaseController
 {
@@ -14,10 +17,10 @@ class AssignmentController extends AdminBaseController
     {
         $user = $request->user();
 
-        $search     = $request->get('search', '');
-        $year       = $request->get('year', '');
-        $semester   = $request->get('semester', '');
-        $status     = $request->get('status', '');
+        $search = $request->get('search', '');
+        $year = $request->get('year', '');
+        $semester= $request->get('semester', '');
+        $status= $request->get('status', '');
         $department = $request->get('department', '');
 
         $query = DB::table('teacher_subjects')
@@ -25,9 +28,14 @@ class AssignmentController extends AdminBaseController
             ->join('subjects', 'teacher_subjects.subject_id', '=', 'subjects.id')
             ->join('courses', 'subjects.course_id', '=', 'courses.id')
             ->join('departments', 'courses.department_id', '=', 'departments.id')
-            ->select('teacher_subjects.*','teachers.name',
-                'teachers.department','subjects.subject_name','subjects.subject_code')
-            ->where('departments.campus_id', $user->campus_id) 
+            ->select(
+                'teacher_subjects.*',
+                'teachers.name',
+                'teachers.department',
+                'subjects.subject_name',
+                'subjects.subject_code'
+            )
+            ->where('departments.campus_id', $user->campus_id)
             ->orderBy('teacher_subjects.id', 'desc');
 
         if ($search) {
@@ -37,87 +45,32 @@ class AssignmentController extends AdminBaseController
                     ->orWhere('subjects.subject_code', 'like', "%{$search}%");
             });
         }
-
-        if ($year) {
-            $query->where('teacher_subjects.academic_year', $year);
-        }
-
-        if ($semester) {
-            $query->where('teacher_subjects.semester', $semester);
-        }
-
-        if ($status) {
-            $query->where('teacher_subjects.status', $status);
-        }
-
-        if ($department) {
-            $query->where('departments.id', $department);
-        }
+        if ($year) $query->where('teacher_subjects.academic_year', $year);
+        if ($semester) $query->where('teacher_subjects.semester', $semester);
+        if ($status) $query->where('teacher_subjects.status', $status);
+        if ($department) $query->where('departments.id', $department);
 
         $assignments = $query->paginate(15);
-        $years = DB::table('teacher_subjects')->distinct()->pluck('academic_year');
-
+        $years= DB::table('teacher_subjects')->distinct()->pluck('academic_year');
         $departments = DB::table('departments')
             ->where('campus_id', $user->campus_id)
             ->orderBy('name')
             ->get();
 
         return view('admin.assignments.index', compact(
-            'assignments','search','year','semester',
-            'status','department','years','departments'));
-    }
-
-    public function search(Request $request)
-    {
-        $search = $request->get('search', '');
-        $year = $request->get('year', '');
-        $semester = $request->get('semester', '');
-        $status = $request->get('status', '');
-        $department = $request->get('department', '');
-
-        $query = TeacherSubject::with(['teacher', 'subject']);
-
-        if ($search) {
-            $query->whereHas('teacher', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%");
-            })->orWhereHas('subject', function ($q) use ($search) {
-                $q->where('subject_name', 'like', "%{$search}%")
-                    ->orWhere('subject_code', 'like', "%{$search}%");
-            });
-        }
-
-        if ($year) {
-            $query->where('academic_year', $year);
-        }
-
-        if ($semester) {
-            $query->where('semester', $semester);
-        }
-
-        if ($status) {
-            $query->where('status', $status);
-        }
-
-        if ($department) {
-            $query->whereHas('teacher', function ($q) use ($department) {
-                $q->where('department', $department);
-            });
-        }
-
-        $assignments = $query->orderBy('created_at', 'desc')->get();
-
-        return response()->json(['assignments' => $assignments]);
+            'assignments', 'search', 'year', 'semester',
+            'status', 'department', 'years', 'departments'
+        ));
     }
 
     public function create(Request $request)
     {
         $user = $request->user();
         $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
-        $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
         $subjects = DB::table('subjects')->where('course_id', $user->course_id)->get();
+        $classrooms = Classroom::orderBy('room_number')->get();
 
-        return view('admin.assignments.create', compact('teachers', 'subjects'));
+        return view('admin.assignments.create', compact('teachers', 'subjects', 'classrooms'));
     }
 
     public function store(Request $request)
@@ -125,34 +78,64 @@ class AssignmentController extends AdminBaseController
         $validated = $request->validate([
             'teacher_id' => 'required|exists:teachers,id',
             'subject_id' => 'required|exists:subjects,id',
-            'academic_year' => 'nullable|string',
-            'semester' => 'nullable|string',
+            'academic_year' => 'nullable|string|max:20',
+            'semester' => 'nullable|string|max:20',
+            'section' => 'nullable|string|max:10',
+            'classroom_id'=> 'nullable|exists:classrooms,id',
+            'day_of_week' => 'nullable|string|max:20',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
 
+        $academicYear = $validated['academic_year'] ?? date('Y');
+        $semester     = $validated['semester'] ?? '1';
+        $exists = TeacherSubject::where('teacher_id',$validated['teacher_id'])
+            ->where('subject_id',$validated['subject_id'])
+            ->where('academic_year',$academicYear)
+            ->where('semester',$semester)
+            ->exists();
+
+        if ($exists) {
+            return back()
+                ->withInput()
+                ->with('error', 'This professor is already assigned to this subject for the selected academic year and semester.');
+        }
+
         try {
-            TeacherSubject::create($validated + [
-                'academic_year' => $validated['academic_year'] ?? date('Y'),
-                'semester' => $validated['semester'] ?? '1',
+            DB::beginTransaction();
+
+            TeacherSubject::create([
+                'teacher_id'=> $validated['teacher_id'],
+                'subject_id' => $validated['subject_id'],
+                'academic_year'=> $academicYear,
+                'semester'=> $semester,
                 'status' => 'active',
             ]);
 
-            return redirect()->route('admin.assignments.index')
-                ->with('success', 'Assignment created successfully!');
+            DB::table('schedules')->insert([
+                'teacher_id' => $validated['teacher_id'],
+                'subject_id' => $validated['subject_id'],
+                'classroom_id' => $validated['classroom_id'] ?? null,
+                'section' => $validated['section'] ?? null,
+                'day_of_week'  => $validated['day_of_week'] ?? null,
+                'day' => $validated['day_of_week'] ?? null,
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'status' => 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            DB::commit();
+            app(StudentSubjectController::class)->autoEnrollStudentsByYearLevel(
+                $validated['subject_id'],
+                $validated['teacher_id']
+            );
+            return redirect()->route('admin.assignments.index')->with('success', 'Assignment created successfully!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error creating assignment: ' . $e->getMessage());
-        }
-    }
-
-    public function destroy($id)
-    {
-        try {
-            $assignment = TeacherSubject::findOrFail($id);
-            $assignment->delete();
-
-            return redirect()->route('admin.assignments.index')
-                ->with('success', 'Assignment deleted successfully!');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting assignment: ' . $e->getMessage());
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->with('error', 'Error creating assignment: ' . $e->getMessage());
         }
     }
 }

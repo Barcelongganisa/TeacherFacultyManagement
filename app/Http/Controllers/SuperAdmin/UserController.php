@@ -16,7 +16,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with('campus');
+        $query = User::with('campus')->whereNotIn('role',['superadmin']);
         
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {

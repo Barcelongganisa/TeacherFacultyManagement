@@ -8,29 +8,36 @@ use Illuminate\Support\Facades\DB;
 
 class ScheduleController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
-        $teacher = DB::table('teachers')->where('user_id', $user->id)->first();
-        $teacherId = $teacher->id ?? null;
-        $userId = $user->id;
-        $timeSlots = DB::table('time_slots')
-            ->where('status', 'active')
-            ->orderBy('start_time')
-            ->get();
-        $scheduleData = [];
-        if ($teacherId) {
-            $schedules = DB::table('schedules as s')
-                ->join('subjects as sub', 's.subject_id', '=', 'sub.id')
-                ->join('classrooms as c', 's.classroom_id', '=', 'c.id')
-                ->where('s.teacher_id', $userId)
-                ->where('s.status', 'active')
-                ->select('s.day','s.time_slot_id','sub.subject_code','sub.subject_name','c.room_number','c.room_name')->get();
-            foreach ($schedules as $schedule) {
-                $scheduleData[$schedule->day][$schedule->time_slot_id] = $schedule;
-            }
+    public function index($teacherId){
+        $teacher = DB::table('teachers')
+            ->where('id', $teacherId)
+            ->first();
+        if (!$teacher) {
+            abort(404);
         }
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        return view('teacher.schedule', compact( 'timeSlots', 'scheduleData','days','teacherId','userId'));
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        $schedules = DB::table('schedules')
+            ->leftJoin('subjects', 'subjects.id', '=', 'schedules.subject_id')
+            ->leftJoin('classrooms', 'classrooms.id', '=', 'schedules.classroom_id')
+            ->leftJoin('courses','courses.id', '=', 'subjects.course_id')
+            ->where('schedules.teacher_id', $teacherId)
+            ->select('schedules.id','schedules.day_of_week','schedules.start_time','schedules.section','courses.code as course_coode',
+                'schedules.end_time','schedules.section','subjects.subject_code','subjects.subject_name','classrooms.room_number','subjects.year_level')
+            ->get();
+        foreach ($schedules as $s) {
+            $s->day_of_week = ucfirst(strtolower(trim($s->day_of_week)));
+        }
+        $subjects = DB::table('subjects')
+            ->where('status', 'active')
+            ->orderBy('subject_name')
+            ->get();
+
+        $classrooms = DB::table('classrooms')
+            ->where('status', 'active')
+            ->orderBy('room_number')
+            ->get();
+
+        return view('teacher.schedule', compact('teacher','schedules','days',
+            'subjects','classrooms'));
     }
 }

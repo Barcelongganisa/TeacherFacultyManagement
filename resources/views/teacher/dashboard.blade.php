@@ -21,32 +21,7 @@
 </div>
 @endif
 
-<!-- Quick Stats -->
-<div class="row mb-4">
-    <div class="col-md-6 col-lg-4">
-        <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-number">{{ $scheduleCount }}</div>
-            <div class="stat-label">Total Classes This Week</div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-        <div class="stat-card">
-            <div class="stat-icon">📚</div>
-            <div class="stat-number">{{ $subjectCount }}</div>
-            <div class="stat-label">Assigned Subjects</div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-        <div class="stat-card">
-            <div class="stat-icon">🏛️</div>
-            <div class="stat-number">{{ $roomCount }}</div>
-            <div class="stat-label">Assigned Rooms</div>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Links -->
+<!-- Quick Links + Today's Classes -->
 <div class="row mb-4">
     <div class="col-md-6">
         <div class="card">
@@ -54,7 +29,7 @@
                 <h5>Quick Links</h5>
             </div>
             <div class="card-body">
-                <a href="{{ route('teacher.schedule') }}" class="btn btn-primary btn-sm mb-2 w-100">
+                <a href="{{ route('teacher.schedule', $teacher->id) }}" class="btn btn-primary btn-sm mb-2 w-100">
                     <i class="fas fa-calendar-alt"></i> View Full Schedule
                 </a>
                 <a href="{{ route('teacher.current-assignment') }}" class="btn btn-primary btn-sm mb-2 w-100">
@@ -63,9 +38,6 @@
                 <a href="{{ route('teacher.profile.edit') }}" class="btn btn-primary btn-sm mb-2 w-100">
                     <i class="fas fa-user-edit"></i> Edit My Profile
                 </a>
-                {{-- <a href="{{ route('teacher.availability') }}" class="btn btn-primary btn-sm mb-2 w-100">
-                    <i class="fas fa-clock"></i> Set Availability
-                </a> --}}
                 <a href="{{ route('teacher.reservations') }}" class="btn btn-primary btn-sm mb-2 w-100">
                     <i class="fas fa-door-open"></i> Room Reservations
                 </a>
@@ -96,6 +68,105 @@
                     @endif
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Weekly Schedule Calendar -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="fas fa-chalkboard-teacher me-2 text-success"></i>
+            Weekly Schedule
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered schedule-grid">
+                <thead class="bg-success text-white">
+                    <tr>
+                        <th class="time-column">Time</th>
+                        @foreach($days as $day)
+                        <th class="text-center">{{ $day }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                    $startHour = 7;
+                    $endHour = 21;
+                    $grid = [];
+                    $covered = [];
+
+                    foreach ($days as $day) {
+                        for ($h = $startHour; $h < $endHour; $h++) {
+                            $grid[$day][$h] = null;
+                            $covered[$day][$h] = false;
+                        }
+                    }
+
+                    foreach ($schedules as $sch) {
+                        $day = trim($sch->day_of_week);
+                        $startHourSched = (int) \Carbon\Carbon::parse($sch->start_time)->format('H');
+                        $endHourSched = (int) \Carbon\Carbon::parse($sch->end_time)->format('H');
+
+                        if (!isset($grid[$day])) continue;
+
+                        $grid[$day][$startHourSched] = $sch;
+
+                        for ($h = $startHourSched + 1; $h < $endHourSched; $h++) {
+                            if (isset($covered[$day][$h])) {
+                                $covered[$day][$h] = true;
+                            }
+                        }
+                    }
+                    @endphp
+
+                    @for($hour = $startHour; $hour < $endHour; $hour++)
+                    <tr>
+                        <td class="time-slot bg-soft-green">
+                            <div class="text-center interval-time">
+                                <div class="interval-start">{{ \Carbon\Carbon::createFromTime($hour,0)->format('g:i A') }}</div>
+                                <div class="interval-main">{{ \Carbon\Carbon::createFromTime($hour,30)->format('g:i A') }}</div>
+                                <div class="interval-end">{{ \Carbon\Carbon::createFromTime($hour+1,0)->format('g:i A') }}</div>
+                            </div>
+                        </td>
+
+                        @foreach($days as $day)
+                            @if($covered[$day][$hour]) @continue @endif
+
+                            @php
+                            $sched = $grid[$day][$hour];
+                            $rowspan = 1;
+
+                            if ($sched) {
+                                $start = (int)\Carbon\Carbon::parse($sched->start_time)->format('H');
+                                $end = (int)\Carbon\Carbon::parse($sched->end_time)->format('H');
+                                $rowspan = $end - $start;
+                            }
+                            @endphp
+
+                            <td class="schedule-cell" rowspan="{{ $rowspan }}">
+                                @if($sched)
+                                <div class="class-block">
+                                    <div class="subject-code"><strong>{{ $sched->subject_code }}</strong></div>
+                                    <div class="subject-name">{{ $sched->subject_name }}</div>
+                                    <div class="section-info">
+                                        <span class="badge bg-light text-success border border-success">
+                                           {{ $sched->course_coode }} {{ intval(preg_replace('/\D/', '', $sched->year_level)) }} - {{ $sched->section }}
+                                        </span>
+                                    </div>
+                                    <div class="room-info">
+                                        <small><i class="fas fa-map-marker-alt"></i> {{ $sched->room_number }}</small>
+                                    </div>
+                                </div>
+                                @endif
+                            </td>
+                        @endforeach
+                    </tr>
+                    @endfor
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -136,17 +207,26 @@
     text-align: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
-.stat-icon {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-}
-.stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-}
-.stat-label {
-    font-size: 0.9rem;
-    opacity: 0.9;
+.stat-icon { font-size: 2.5rem; margin-bottom: 10px; }
+.stat-number { font-size: 2rem; font-weight: bold; }
+.stat-label { font-size: 0.9rem; opacity: 0.9; }
+
+.schedule-grid th { background-color: #2ecc71 !important; color: white; text-align: center; font-weight: bold; border: 1px solid #27ae60; padding: 12px 8px; }
+.time-column { width: 150px; min-width: 150px; }
+.time-slot { background-color: #e8f8f5; border: 1px solid #27ae60; vertical-align: middle; }
+.interval-main { font-size: 1.1rem; font-weight: 700; color: #155724; }
+.interval-start, .interval-end { font-size: 0.72rem; color: #555; }
+.schedule-cell { width: 140px; height: 100px; vertical-align: middle; border: 1px solid #27ae60; padding: 4px; position: relative; }
+.class-block { background-color: #d4edda; border: 1px solid #27ae60; border-radius: 4px; padding: 6px; position: absolute; inset: 4px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 2px; }
+.subject-code { font-size: 0.85rem; color: #155724; line-height: 1; }
+.subject-name { font-size: 0.7rem; color: #155724; line-height: 1.1; margin-bottom: 2px; }
+.section-info { margin: 2px 0; }
+.section-info .badge { font-size: 0.65rem; padding: 2px 4px; }
+.room-info { font-size: 0.65rem; color: #6c757d; }
+.bg-soft-green { background-color: #e8f8f5; }
+@media (max-width: 768px) {
+    .schedule-grid { font-size: 0.75rem; }
+    .schedule-cell { width: 100px; height: 80px; }
 }
 </style>
 @endpush

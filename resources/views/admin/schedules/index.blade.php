@@ -12,7 +12,6 @@
 @endsection
 
 @section('content')
-<!-- Search and Filter Section -->
 <div class="card mb-4">
     <div class="card-header">
         <h5 class="mb-0">
@@ -96,9 +95,9 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-circle bg-success text-white me-2">
-                                        {{ substr($teacher->name, 0, 1) }}{{ substr($teacher->last_name, 0, 1) }}
+                                        {{ substr($teacher->name, 0, 1) }}
                                     </div>
-                                    <strong>{{ $teacher->name }} {{ $teacher->last_name }}</strong>
+                                    <strong>{{ $teacher->name }}</strong>
                                 </div>
                             </td>
                             <td>{{ $teacher->email }}</td>

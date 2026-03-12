@@ -118,7 +118,7 @@
         .card-body {
             padding: 1.5rem;
             margin-top: 10px !important; 
-            background: var(--soft-green);
+            /* background: var(--soft-green); */
         }
 
         /* ── Buttons ── */

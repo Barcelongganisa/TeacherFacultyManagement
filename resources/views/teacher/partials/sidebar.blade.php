@@ -338,7 +338,7 @@ if($user->role == 'teacher'){
         <div class="nav-section-title">TEACHING</div>
         
         <li class="nav-item">
-            <a href="{{ route('teacher.schedule') }}" class="nav-link {{ request()->routeIs('teacher.schedule') ? 'active' : '' }}">
+            <a href="{{ route('teacher.schedule', $teacher->id) }}" class="nav-link {{ request()->routeIs('teacher.schedule') ? 'active' : '' }}">
                 <i class="fas fa-calendar-alt"></i>
                 <span>My Schedule</span>
             </a>

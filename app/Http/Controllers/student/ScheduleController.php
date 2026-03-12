@@ -11,19 +11,26 @@ class ScheduleController extends Controller
     public function schedule()
     {
         $user = Auth::user();
-
-        $schedules = DB::table('schedules as s')
-            ->join('subjects as sub', 's.subject_id', '=', 'sub.id')
-            ->join('classrooms as c', 's.classroom_id', '=', 'c.id')
-            ->join('time_slots as ts', 's.time_slot_id', '=', 'ts.id')
-            ->join('users as u', 's.teacher_id', '=', 'u.id')
-            ->where('sub.course_id', $user->course_id)->where('s.status', 'active')
-            ->where('sub.year_level',$user->year_level)
-            ->select('s.day','s.day_of_week','sub.subject_code','sub.subject_name','ts.start_time',
-                'ts.end_time','c.room_number','c.room_name','u.name as teacher_name')
-            ->orderByRaw("FIELD(s.day, 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')")
+        $schedules = DB::table('enrollments as e')
+            ->join('subjects as sub', 'e.subject_id', '=', 'sub.id')
+            ->join('schedules as s', 's.subject_id', '=', 'sub.id')
+            ->leftJoin('classrooms as c', 's.classroom_id', '=', 'c.id')
+            ->leftJoin('teachers as t', 's.teacher_id', '=', 't.id')
+            ->where('e.student_id', $user->id)
+            ->where('e.status', 'active')
+            ->where('s.status', 'active')
+            ->select( 's.day_of_week','s.start_time',
+                's.end_time','sub.subject_code',
+                'sub.subject_name','sub.credits',
+                'c.room_number','c.room_name',
+                't.name as teacher_name'
+            )
+            ->orderByRaw("FIELD(s.day_of_week, 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')")
+            ->orderBy('s.start_time')
             ->get();
 
-        return view('student.schedule', compact('schedules'));
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        return view('student.schedule', compact('schedules', 'days'));
     }
 }

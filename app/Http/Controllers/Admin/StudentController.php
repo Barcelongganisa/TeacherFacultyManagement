@@ -69,19 +69,18 @@ class StudentController extends AdminBaseController
 
         try {
             DB::table('users')->insert([
-                'name'          => $request->first_name . ' ' . $request->last_name,
-                'email'         => $request->email,
-                'password'      => Hash::make($request->password),
-                'role'          => 'student',
-                'campus_id'     => $request->campus_id,
-                'department'    => $request->department_id,
-                'course_id'     => $request->course_id,
-                'year_level'    => $request->year_level,
-                'status'        => $request->status,
-                'created_at'    => now(),
-                'updated_at'    => now(),
+                'name'=> $request->first_name . ' ' . $request->last_name,
+                'email'=> $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'student',
+                'campus_id' => $request->campus_id,
+                'department' => $request->department_id,
+                'course_id' => $request->course_id,
+                'year_level'=> $request->year_level,
+                'status'=> $request->status,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
-
             return redirect()->route('admin.students.index')
                 ->with('success', 'Student added successfully!');
         } catch (\Exception $e) {
@@ -110,8 +109,8 @@ class StudentController extends AdminBaseController
 
         try {
             $data = [
-                'name'   => $validated['first_name'] . ' ' . $validated['last_name'],
-                'email'  => $validated['email'],
+                'name'=> $validated['first_name'] . ' ' . $validated['last_name'],
+                'email'=> $validated['email'],
                 'campus' => $validated['campus'],
                 'status' => $validated['status'],
             ];

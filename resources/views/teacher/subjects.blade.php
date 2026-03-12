@@ -14,35 +14,21 @@
         <div class="col-md-4">
             <div class="stat-card">
                 <div class="stat-icon">📚</div>
-                <div class="stat-number">{{ $subjects->count() }}</div>
+                <div class="stat-number">{{ $totalSubjects }}</div>
                 <div class="stat-label">Total Subjects</div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
                 <div class="stat-icon">⏰</div>
-                <div class="stat-number">
-                    @php
-                    $totalCredits = $subjects->sum('credits');
-                    @endphp
-                    {{ $totalCredits }}
-                </div>
+                <div class="stat-number">{{ $totalCredits }}</div>
                 <div class="stat-label">Total Credits</div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
                 <div class="stat-icon">👥</div>
-                <div class="stat-number">
-                    @php
-                    $totalStudents = DB::table('enrollments')
-                    ->join('teacher_subjects', 'enrollments.subject_id', '=', 'teacher_subjects.subject_id')
-                    ->where('teacher_subjects.teacher_id', auth()->user()->teacher->id ?? 0)
-                    ->where('enrollments.status', 'enrolled')
-                    ->count();
-                    @endphp
-                    {{ $totalStudents }}
-                </div>
+                <div class="stat-number">{{ $totalStudents }}</div>
                 <div class="stat-label">Total Students</div>
             </div>
         </div>
@@ -65,41 +51,30 @@
 
                     <div class="subject-details mt-3">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <small class="text-muted">Credits</small>
                                 <div class="fw-bold">{{ $subject->credits ?? 'N/A' }}</div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
+                                <small class="text-muted">Year Level</small>
+                                <div class="fw-bold">{{ $subject->year_level ?? 'N/A' }}</div>
+                            </div>
+                            <div class="col-4">
                                 <small class="text-muted">Schedule</small>
-                                <div class="fw-bold">
-                                    @php
-                                    $scheduleCount = DB::table('schedules')
-                                    ->where('subject_id', $subject->id)
-                                    ->where('teacher_id', auth()->user()->teacher->id ?? 0)
-                                    ->count();
-                                    @endphp
-                                    {{ $scheduleCount }} sessions/week
-                                </div>
+                                <div class="fw-bold">{{ $subject->schedule_count }} sessions/week</div>
                             </div>
                         </div>
                     </div>
 
-                    @php
-                    $studentCount = DB::table('enrollments')
-                    ->where('subject_id', $subject->id)
-                    ->where('status', 'enrolled')
-                    ->count();
-                    @endphp
-
                     <div class="mt-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <span>Enrolled Students</span>
-                            <span class="badge bg-primary">{{ $studentCount }}</span>
+                            <span class="badge bg-primary">{{ $subject->enrolled_students }}</span>
                         </div>
                         <div class="progress mt-1" style="height: 5px;">
                             @php
-                            $capacity = 50; // Default capacity, adjust based on your data
-                            $percentage = min(($studentCount / $capacity) * 100, 100);
+                                $capacity = 50;
+                                $percentage = min(($subject->enrolled_students / $capacity) * 100, 100);
                             @endphp
                             <div class="progress-bar bg-success" style="width: {{ $percentage }}%"></div>
                         </div>
@@ -239,7 +214,6 @@
 @push('scripts')
 <script>
     function viewSchedule(subjectId) {
-
         const modal = new bootstrap.Modal(document.getElementById('subjectScheduleModal'));
 
         document.getElementById('subjectScheduleContent').innerHTML =
@@ -248,51 +222,42 @@
         fetch(`/teacher/subject/${subjectId}/schedule`)
             .then(res => res.json())
             .then(data => {
-
                 let rows = '';
 
                 if (data.length === 0) {
                     rows = `<tr><td colspan="3" class="text-center">No schedule found</td></tr>`;
                 } else {
-
                     data.forEach(schedule => {
-
                         rows += `
-                <tr>
-                    <td>${schedule.day}</td>
-                    <td>${schedule.start_time} - ${schedule.end_time}</td>
-                    <td>${schedule.room ?? 'N/A'}</td>
-                </tr>
-                `;
+                            <tr>
+                                <td>${schedule.day}</td>
+                                <td>${schedule.start_time} - ${schedule.end_time}</td>
+                                <td>${schedule.room ?? 'N/A'}</td>
+                            </tr>
+                        `;
                     });
-
                 }
 
                 document.getElementById('subjectScheduleContent').innerHTML = `
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>Day</th>
-                        <th>Time</th>
-                        <th>Room</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
-        </div>
-        `;
-
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Room</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
             });
 
         modal.show();
     }
 
-
     function viewStudents(subjectId) {
-
         const modal = new bootstrap.Modal(document.getElementById('studentsListModal'));
 
         document.getElementById('studentsListContent').innerHTML =
@@ -301,40 +266,43 @@
         fetch(`/teacher/subject/${subjectId}/students`)
             .then(res => res.json())
             .then(data => {
-
                 let rows = '';
 
                 if (data.length === 0) {
-                    rows = `<tr><td colspan="4" class="text-center">No students enrolled</td></tr>`;
+                    rows = `<tr><td colspan="3" class="text-center">No students enrolled</td></tr>`;
                 } else {
-
                     data.forEach(student => {
-                        rows += `<tr>
-                            <td>${student.name}</td>
-                            <td>${student.email}</td>
-                            <td>${student.created_at}</td>
-                        </tr>`;
-                    });
+                        const date = new Date(student.created_at);
+                        const formattedDate = date.toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
 
+                        rows += `
+                            <tr>
+                                <td>${student.name}</td>
+                                <td>${student.email}</td>
+                                <td>${formattedDate}</td>
+                            </tr>
+                        `;
+                    });
                 }
 
                 document.getElementById('studentsListContent').innerHTML = `
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Enrolled Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
-        </div>
-        `;
-
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Enrolled Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
             });
 
         modal.show();

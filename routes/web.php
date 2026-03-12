@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\DB;
 Route::get('/', function () {
     return view('welcome');
 });
+//  Route::get('schedules/teacher/{teacher_id}', [AdminScheduleController::class, 'viewSchedule'])->name('schedules.view');
 // Super Admin Routes
 Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->name('superadmin.')->group(function () {
     // Dashboard
@@ -63,7 +64,7 @@ Route::middleware(['auth', 'verified', 'super_admin'])->prefix('super-admin')->n
     Route::resource('courses', SuperAdminCourseController::class);
     // Reservations (global view)
     Route::get('reservations', [SuperAdminReservationController::class, 'index'])->name('reservations.index');
-    Route::get('reservations/{reservation}', [SuperAdminReservationController::class, 'show'])->name('reservations.show'); 
+    Route::get('reservations/{reservation}', [SuperAdminReservationController::class, 'show'])->name('reservations.show');
     Route::post('reservations/{reservation}/approve', [SuperAdminReservationController::class, 'approve'])->name('reservations.approve');
     Route::post('reservations/{reservation}/reject', [SuperAdminReservationController::class, 'reject'])->name('reservations.reject');
 
@@ -152,7 +153,7 @@ Route::middleware(['auth', 'teacher'])->prefix('teacher')->name('teacher.')->gro
     Route::post('/profile/update', [TeacherProfileController::class, 'update'])->name('profile.update');
 
     // Schedule
-    Route::get('/schedule', [TeacherScheduleController::class, 'index'])->name('schedule');
+    Route::get('/schedule/{teacherId}', [TeacherScheduleController::class, 'index'])->name('schedule');
 
     // Reservations
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations');
