@@ -111,9 +111,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('schedules/{schedule_id}', [AdminScheduleController::class, 'destroy'])->name('schedules.destroy');
     Route::get('schedules/get-data/{schedule_id}', [AdminScheduleController::class, 'getScheduleData'])->name('schedules.get-data');
 
-    // Teacher Assignments
-    Route::resource('assignments', AssignmentController::class)->except(['edit', 'update', 'show']);
+    // Teacher Assignments — custom routes MUST come before resource()
+    Route::get('assignments/taken-slots', [AssignmentController::class, 'takenSlots'])->name('assignments.takenSlots');
+    Route::get('assignments/available-subjects', [AssignmentController::class, 'availableSubjects'])->name('assignments.availableSubjects');
     Route::post('assignments/search', [AssignmentController::class, 'search'])->name('assignments.search');
+    Route::resource('assignments', AssignmentController::class)->except(['edit', 'update', 'show']);
 
     // Time Slots
     Route::resource('time-slots', TimeSlotController::class);

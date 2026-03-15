@@ -63,18 +63,22 @@ class AssignmentController extends AdminBaseController
         ));
     }
 
-    public function create(Request $request)
-    {
-        $user = $request->user();
-        $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
-        $subjects = DB::table('subjects')->where('course_id', $user->course_id)->get();
-        $classrooms = Classroom::orderBy('room_number')->get();
+    // public function create(Request $request){
+    //     $user = $request->user();
+    //     $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
+    //     $subjects = DB::table('subjects')->where('course_id', $user->course_id)->get();
+    //     $classrooms = Classroom::orderBy('room_number')->get();
 
-        return view('admin.assignments.create', compact('teachers', 'subjects', 'classrooms'));
-    }
+    //     return view('admin.assignments.create', compact('teachers', 'subjects', 'classrooms'));
+    // }
+    public function create(){
+    $teachers = Teacher::where('status', 'active')->orderBy('name')->get();
+    $classrooms = DB::table('classrooms')->orderBy('room_number')->get();
+    $subjects = collect(); // empty, loaded via AJAX
+    return view('admin.assignments.create', compact('teachers', 'subjects', 'classrooms'));
+}
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $validated = $request->validate([
             'teacher_id' => 'required|exists:teachers,id',
             'subject_id' => 'required|exists:subjects,id',
@@ -138,4 +142,29 @@ class AssignmentController extends AdminBaseController
                 ->with('error', 'Error creating assignment: ' . $e->getMessage());
         }
     }
+public function availableSubjects(Request $request){
+    $request->validate([
+        'teacher_id'=> 'required|exists:teachers,id',
+        'academic_year' => 'nullable|string',
+        'semester' => 'nullable|string',
+    ]);
+
+    $academicYear = $request->academic_year ?? date('Y');
+    $semester = $request->semester ?? '1';
+
+    // Get ALL subjects already assigned for this term
+    $assignedIds = DB::table('teacher_subjects')
+        ->where('academic_year', $academicYear)
+        ->where('semester', $semester)
+        ->pluck('subject_id')
+        ->toArray();
+
+    // Only return subjects not yet assigned
+    $subjects = DB::table('subjects')
+        ->whereNotIn('id', $assignedIds)
+        ->orderBy('subject_name')
+        ->get();
+
+    return response()->json($subjects);
+}
 }

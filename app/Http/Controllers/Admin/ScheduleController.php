@@ -37,8 +37,7 @@ class ScheduleController extends AdminBaseController
         ));
     }
 
-    public function viewSchedule($teacherId)
-    {
+    public function viewSchedule($teacherId){
         $teacher = DB::table('teachers')
             ->where('id', $teacherId)
             ->first();
