@@ -34,7 +34,7 @@ class SuperAdminDepartmentController extends Controller
     public function store(Request $request){
         $request->validate([
             'name' => 'required|string|max:255',
-            'code'=> 'required|string|max:20|unique:departments,code',
+            'code' => 'required|string|max:20|unique:departments,code,NULL,id,campus_id,' .$request->campus_id,
             'campus_id'=> 'required|exists:campuses,id',
         ]);
 

@@ -34,7 +34,7 @@ class SuperAdminCourseController extends Controller
     }
 
     public function create(){
-        $campuse= DB::table('campuses')->orderBy('campus_name')->get();
+        $campuses= DB::table('campuses')->orderBy('campus_name')->get();
         $departments  = DB::table('departments')->orderBy('name')->get();
         $coordinators = DB::table('users')->where('role', 'admin')->orderBy('name')->get();
         return view('superadmin.courses.create', compact('campuses', 'departments', 'coordinators'));
